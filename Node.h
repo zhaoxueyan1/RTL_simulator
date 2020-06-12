@@ -13,8 +13,8 @@ public:
 	
 	Node(int id, int dType, int nxtNum, int preNum);
 	
-	int cntComb; // the number of Comb
-	int cntReg;  // the number of Reg
+	//static int cntComb; // the number of Comb
+	//static int cntReg;  // the number of Reg
 	int id; // the index of this 
 	int dType;// the type of this register
 	int status=0; // describe the setflag
@@ -32,7 +32,7 @@ public:
 	static Node * Gptr; // to storge the whole objects
 	
 	virtual void* GetData() = 0;
-
+	// virtual void* Create() = 0;
 	virtual void setData(void * p);
 
 	virtual ~Node() {}

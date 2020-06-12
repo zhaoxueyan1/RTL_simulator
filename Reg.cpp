@@ -7,7 +7,8 @@ Reg::Reg(int id, int dtype, int nxtNum, int pre_num )
 {}
 void Reg::setData()
 {
-	if (!this->Data)
-		free(this->Data);
-	this->Data = (Node::Gptr+((*this->preTbl)[0]))->GetData();
+	/*if (!this->Data)
+		free(this->Data);*/
+
+	memcpy(this->Data,(Node::Gptr+((*this->preTbl)[0]))->GetData(),this->dType);
 }

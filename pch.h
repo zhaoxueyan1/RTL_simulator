@@ -17,6 +17,16 @@
 #include<unordered_map>
 #include<queue>
 
+#define UINT_8 unsigned char
+#define UINT_16 unsigned short
+#define UINT_32 unsigned int
+#define UINT_64 unsigned long long 
 // TODO: 添加要在此处预编译的标头
+enum {
+	BOOL = 1,
+	INT_16 = 2,
+	INT_32 = 4,
+	INT_64 = 8,
+};
 
 #endif //PCH_H

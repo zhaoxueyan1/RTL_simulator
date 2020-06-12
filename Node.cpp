@@ -10,6 +10,8 @@ Node::Node(int id, int dType, int nxtNum, int preNum)
 {
 	preTbl = new vector<int>;
 	nxtTbl = new vector<int>;
+	this->Data = malloc(dType);
+	memset(this->Data, 0, dType);
 	//Node::N++;
 }
 
@@ -25,9 +27,7 @@ void Node::SetArg(int dType, int preNum, int nxtNum) {
 }
 
 void Node::setData(void * p) {
-	if (!this->Data)
-		free(this->Data);
-	this->Data = p;
+	memcpy(this->Data, p, this->dType);
 }
 
 vector<Node*>* Node::AllSet = nullptr;
