@@ -34,6 +34,8 @@ public:
 	virtual void* GetData() = 0;
 	// virtual void* Create() = 0;
 	virtual void setData(void * p);
-
+	void* getData() {
+		return Data;
+	}
 	virtual ~Node() {}
 };

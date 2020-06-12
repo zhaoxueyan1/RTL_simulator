@@ -11,7 +11,7 @@ typedef pair<int, void*>P;
 namespace Simulator {
 
 
-	vector<P>SetS;
+	set<P>SetS;
 	queue<int>TransQueue;
 	void Init(int N) {
 		Node::AllSet = new vector<Node*>;
@@ -44,11 +44,11 @@ namespace Simulator {
 	void RegSet() {
 		while (!TransQueue.empty())
 			TransQueue.pop();
-		int j = 0;
+		auto j = SetS.begin();
 		for (int i = 0; i < Node::RegSet->size(); i++) {
 			Reg * t = dynamic_cast<Reg*>((*Node::RegSet)[i]);
-			if (i == SetS[j].first) {
-				((Node *)t)->setData(SetS[j].second);
+			if (j!=SetS.end()&&i == j->first) {
+				((Node *)t)->setData(j->second);
 				j++;
 			}
 			/*t->GetData();
@@ -75,10 +75,10 @@ namespace Simulator {
 			Node * t = (*Node::CombSet)[i];
 			switch (t->dType)
 			{
-			case 1: printf("%u ", *((UINT_8  *)t->GetData())); break;
-			case 2: printf("%u ", *((UINT_16 *)t->GetData())); break;
-			case 4: printf("%u ", *((UINT_32 *)t->GetData())); break;
-			case 8: printf("%llu ", *((UINT_64 *)t->GetData())); break;
+			case 1: printf("%u ", *((UINT_8  *)  t->getData())); break;
+			case 2: printf("%u ", *((UINT_16 *)  t->getData())); break;
+			case 4: printf("%u ", *((UINT_32 *)  t->getData())); break;
+			case 8: printf("%llu ", *((UINT_64 *)t->getData())); break;
 			default:
 				break;
 			}
@@ -89,16 +89,22 @@ namespace Simulator {
 		/*for (int i = 0; i < Node::CombSet->size(); i++) {
 				(*Node::CombSet)[i]->GetData();
 		}*/
+		bool vis[10];
+		memset(vis, 0, sizeof(vis));
 		while (!TransQueue.empty()) {
 			int u = TransQueue.front(); TransQueue.pop();
+			if (vis[u])
+				continue;
+			vis[u] = true;
 			Node * t = (*Node::AllSet)[u];
 			t->GetData();
 			for (int i = 0; i < t->nxtTbl->size(); i++) {
-				if ((*t->nxtTbl)[i] >= Node::RegSet->size()) {
-					TransQueue.push((*t->nxtTbl)[i]);
+				int tt = (*t->nxtTbl)[i];
+				if ( tt>= Node::RegSet->size()&&!vis[tt]) {
+					TransQueue.push(tt);
 				}
 				else {
-					SetS.push_back(make_pair((*t->nxtTbl)[i],t->GetData() ));
+					SetS.insert(make_pair((*t->nxtTbl)[i],t->GetData() ));
 				}
 			}
 		}
@@ -106,10 +112,10 @@ namespace Simulator {
 
 	void MoveCycle(vector<P>& t) {
 		for (auto i : t) {
-			SetS.emplace_back(i);
+			SetS.insert(i);
 		}
-		SetS.clear();
 		RegSet();
+		SetS.clear(); 
 		Comb::setFlag += 1;
 		CombTrans();
 		//RegTrans();
@@ -122,10 +128,13 @@ int main() {
 	vector<P>input;
 	for (int i = 0; i < 5; i++) {
 		input.clear();
-		P t = make_pair(0, (int*)&Data[i]);
+		int* a = new int;
+		*a = Data[i];
+		P t = make_pair(0, a);
 		input.push_back(t);
 		Simulator::MoveCycle(input);
 	}
+	Simulator::RegSet();
 	return 0;
 }
 # endif

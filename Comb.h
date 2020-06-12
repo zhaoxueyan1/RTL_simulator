@@ -5,7 +5,7 @@
 class Comb :public Node 
 {
 public:
-	static bool setFlag;
+	static int setFlag;
 	static int CombNumber;
 	Comb() {
 	}
