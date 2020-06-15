@@ -1,0 +1,296 @@
+{
+    "~GCD|GCD>clock": {
+      "kind": "PortKind",
+      "type": "ClockType",
+      "expr": "Reference(clock,ClockType,PortKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>x@clock", "~GCD|GCD>y@clock"],
+      "declaration": "Port(,clock,Input,ClockType)"
+    },
+    "~GCD|GCD>reset": {
+      "kind": "PortKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "Reference(reset,UIntType(IntWidth(1)),PortKind,SourceFlow)",
+      "sinks": [],
+      "declaration": "Port(,reset,Input,UIntType(IntWidth(1)))"
+    },
+    "~GCD|GCD>io": {
+      "kind": "PortKind",
+      "type": "BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1)))))",
+      "expr": "Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow)",
+      "sinks": [],
+      "declaration": "Port(,io,Output,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))))"
+    },
+    "~GCD|GCD>x": {
+      "kind": "RegKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Reference(x,UIntType(IntWidth(32)),RegKind,DuplexFlow)",
+      "sinks": ["~GCD|GCD>x@init", "~GCD|GCD>@gt#0", "~GCD|GCD>@sub#0", "~GCD|GCD>@mux#0", "~GCD|GCD>@sub#1", "~GCD|GCD>io.z"],
+      "declaration": "DefRegister(,x,UIntType(IntWidth(32)),Reference(clock,ClockType,PortKind,SourceFlow),UIntLiteral(0,IntWidth(1)),Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow))"
+    },
+    "~GCD|GCD>x@clock": {
+      "kind": "PortKind",
+      "type": "ClockType",
+      "expr": "Reference(clock,ClockType,PortKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>x"],
+      "declaration": "DefRegister(,x,UIntType(IntWidth(32)),Reference(clock,ClockType,PortKind,SourceFlow),UIntLiteral(0,IntWidth(1)),Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow))"
+    },
+    "~GCD|GCD>x@reset": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "UIntLiteral(0,IntWidth(1))",
+      "sinks": ["~GCD|GCD>x"],
+      "declaration": "DefRegister(,x,UIntType(IntWidth(32)),Reference(clock,ClockType,PortKind,SourceFlow),UIntLiteral(0,IntWidth(1)),Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow))"
+    },
+    "~GCD|GCD>@0#0": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "UIntLiteral(0,IntWidth(1))",
+      "sinks": ["~GCD|GCD>x@reset"],
+      "declaration": "UIntLiteral(0,IntWidth(1))"
+    },
+    "~GCD|GCD>x@init": {
+      "kind": "RegKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>x"],
+      "declaration": "DefRegister(,x,UIntType(IntWidth(32)),Reference(clock,ClockType,PortKind,SourceFlow),UIntLiteral(0,IntWidth(1)),Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow))"
+    },
+    "~GCD|GCD>y": {
+      "kind": "RegKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Reference(y,UIntType(IntWidth(32)),RegKind,DuplexFlow)",
+      "sinks": ["~GCD|GCD>y@init", "~GCD|GCD>@gt#0", "~GCD|GCD>@sub#0", "~GCD|GCD>@sub#1", "~GCD|GCD>@mux#1", "~GCD|GCD>@eq#1"],
+      "declaration": "DefRegister(,y,UIntType(IntWidth(32)),Reference(clock,ClockType,PortKind,SourceFlow),UIntLiteral(0,IntWidth(1)),Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow))"
+    },
+    "~GCD|GCD>y@clock": {
+      "kind": "PortKind",
+      "type": "ClockType",
+      "expr": "Reference(clock,ClockType,PortKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>y"],
+      "declaration": "DefRegister(,y,UIntType(IntWidth(32)),Reference(clock,ClockType,PortKind,SourceFlow),UIntLiteral(0,IntWidth(1)),Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow))"
+    },
+    "~GCD|GCD>y@reset": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "UIntLiteral(0,IntWidth(1))",
+      "sinks": ["~GCD|GCD>y"],
+      "declaration": "DefRegister(,y,UIntType(IntWidth(32)),Reference(clock,ClockType,PortKind,SourceFlow),UIntLiteral(0,IntWidth(1)),Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow))"
+    },
+    "~GCD|GCD>@0#1": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "UIntLiteral(0,IntWidth(1))",
+      "sinks": ["~GCD|GCD>y@reset"],
+      "declaration": "UIntLiteral(0,IntWidth(1))"
+    },
+    "~GCD|GCD>y@init": {
+      "kind": "RegKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>y"],
+      "declaration": "DefRegister(,y,UIntType(IntWidth(32)),Reference(clock,ClockType,PortKind,SourceFlow),UIntLiteral(0,IntWidth(1)),Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow))"
+    },
+    "~GCD|GCD>_T_14": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "Reference(_T_14,UIntType(IntWidth(1)),ExpKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>@mux#0", "~GCD|GCD>@eq#0"],
+      "declaration": "DefNode(,_T_14,DoPrim(gt,ArrayBuffer(Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow), Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow)),ArrayBuffer(),UIntType(IntWidth(1))))"
+    },
+    "~GCD|GCD>@gt#0": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "DoPrim(gt,ArrayBuffer(Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow), Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow)),ArrayBuffer(),UIntType(IntWidth(1)))",
+      "sinks": ["~GCD|GCD>_T_14"],
+      "declaration": "DoPrim(gt,ArrayBuffer(Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow), Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow)),ArrayBuffer(),UIntType(IntWidth(1)))"
+    },
+    "~GCD|GCD>_T_15": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(33))",
+      "expr": "Reference(_T_15,UIntType(IntWidth(33)),ExpKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>@tail#0"],
+      "declaration": "DefNode(,_T_15,DoPrim(sub,ArrayBuffer(Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow), Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow)),ArrayBuffer(),UIntType(IntWidth(33))))"
+    },
+    "~GCD|GCD>@sub#0": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(33))",
+      "expr": "DoPrim(sub,ArrayBuffer(Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow), Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow)),ArrayBuffer(),UIntType(IntWidth(33)))",
+      "sinks": ["~GCD|GCD>_T_15"],
+      "declaration": "DoPrim(sub,ArrayBuffer(Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow), Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow)),ArrayBuffer(),UIntType(IntWidth(33)))"
+    },
+    "~GCD|GCD>_T_16": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Reference(_T_16,UIntType(IntWidth(32)),ExpKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>@mux#0"],
+      "declaration": "DefNode(,_T_16,DoPrim(tail,ArrayBuffer(Reference(_T_15,UIntType(IntWidth(33)),NodeKind,SourceFlow)),ArrayBuffer(1),UIntType(IntWidth(32))))"
+    },
+    "~GCD|GCD>@tail#0": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "DoPrim(tail,ArrayBuffer(Reference(_T_15,UIntType(IntWidth(33)),NodeKind,SourceFlow)),ArrayBuffer(1),UIntType(IntWidth(32)))",
+      "sinks": ["~GCD|GCD>_T_16"],
+      "declaration": "DoPrim(tail,ArrayBuffer(Reference(_T_15,UIntType(IntWidth(33)),NodeKind,SourceFlow)),ArrayBuffer(1),UIntType(IntWidth(32)))"
+    },
+    "~GCD|GCD>_GEN_0": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Reference(_GEN_0,UIntType(IntWidth(32)),ExpKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>@mux#2"],
+      "declaration": "DefNode(,_GEN_0,Mux(Reference(_T_14,UIntType(IntWidth(1)),NodeKind,SourceFlow),Reference(_T_16,UIntType(IntWidth(32)),NodeKind,SourceFlow),Reference(x,UIntType(IntWidth(32)),ExpKind,DuplexFlow),UIntType(IntWidth(32))))"
+    },
+    "~GCD|GCD>@mux#0": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Mux(Reference(_T_14,UIntType(IntWidth(1)),NodeKind,SourceFlow),Reference(_T_16,UIntType(IntWidth(32)),NodeKind,SourceFlow),Reference(x,UIntType(IntWidth(32)),ExpKind,DuplexFlow),UIntType(IntWidth(32)))",
+      "sinks": ["~GCD|GCD>_GEN_0"],
+      "declaration": "Mux(Reference(_T_14,UIntType(IntWidth(1)),NodeKind,SourceFlow),Reference(_T_16,UIntType(IntWidth(32)),NodeKind,SourceFlow),Reference(x,UIntType(IntWidth(32)),ExpKind,DuplexFlow),UIntType(IntWidth(32)))"
+    },
+    "~GCD|GCD>_T_18": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "Reference(_T_18,UIntType(IntWidth(1)),ExpKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>@mux#1"],
+      "declaration": "DefNode(,_T_18,DoPrim(eq,ArrayBuffer(Reference(_T_14,UIntType(IntWidth(1)),NodeKind,SourceFlow), UIntLiteral(0,IntWidth(1))),ArrayBuffer(),UIntType(IntWidth(1))))"
+    },
+    "~GCD|GCD>@eq#0": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "DoPrim(eq,ArrayBuffer(Reference(_T_14,UIntType(IntWidth(1)),NodeKind,SourceFlow), UIntLiteral(0,IntWidth(1))),ArrayBuffer(),UIntType(IntWidth(1)))",
+      "sinks": ["~GCD|GCD>_T_18"],
+      "declaration": "DoPrim(eq,ArrayBuffer(Reference(_T_14,UIntType(IntWidth(1)),NodeKind,SourceFlow), UIntLiteral(0,IntWidth(1))),ArrayBuffer(),UIntType(IntWidth(1)))"
+    },
+    "~GCD|GCD>@0#2": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "UIntLiteral(0,IntWidth(1))",
+      "sinks": ["~GCD|GCD>@eq#0"],
+      "declaration": "UIntLiteral(0,IntWidth(1))"
+    },
+    "~GCD|GCD>_T_19": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(33))",
+      "expr": "Reference(_T_19,UIntType(IntWidth(33)),ExpKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>@tail#1"],
+      "declaration": "DefNode(,_T_19,DoPrim(sub,ArrayBuffer(Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow), Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow)),ArrayBuffer(),UIntType(IntWidth(33))))"
+    },
+    "~GCD|GCD>@sub#1": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(33))",
+      "expr": "DoPrim(sub,ArrayBuffer(Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow), Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow)),ArrayBuffer(),UIntType(IntWidth(33)))",
+      "sinks": ["~GCD|GCD>_T_19"],
+      "declaration": "DoPrim(sub,ArrayBuffer(Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow), Reference(x,UIntType(IntWidth(32)),RegKind,SourceFlow)),ArrayBuffer(),UIntType(IntWidth(33)))"
+    },
+    "~GCD|GCD>_T_20": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Reference(_T_20,UIntType(IntWidth(32)),ExpKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>@mux#1"],
+      "declaration": "DefNode(,_T_20,DoPrim(tail,ArrayBuffer(Reference(_T_19,UIntType(IntWidth(33)),NodeKind,SourceFlow)),ArrayBuffer(1),UIntType(IntWidth(32))))"
+    },
+    "~GCD|GCD>@tail#1": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "DoPrim(tail,ArrayBuffer(Reference(_T_19,UIntType(IntWidth(33)),NodeKind,SourceFlow)),ArrayBuffer(1),UIntType(IntWidth(32)))",
+      "sinks": ["~GCD|GCD>_T_20"],
+      "declaration": "DoPrim(tail,ArrayBuffer(Reference(_T_19,UIntType(IntWidth(33)),NodeKind,SourceFlow)),ArrayBuffer(1),UIntType(IntWidth(32)))"
+    },
+    "~GCD|GCD>_GEN_1": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Reference(_GEN_1,UIntType(IntWidth(32)),ExpKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>@mux#3"],
+      "declaration": "DefNode(,_GEN_1,Mux(Reference(_T_18,UIntType(IntWidth(1)),NodeKind,SourceFlow),Reference(_T_20,UIntType(IntWidth(32)),NodeKind,SourceFlow),Reference(y,UIntType(IntWidth(32)),ExpKind,DuplexFlow),UIntType(IntWidth(32))))"
+    },
+    "~GCD|GCD>@mux#1": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Mux(Reference(_T_18,UIntType(IntWidth(1)),NodeKind,SourceFlow),Reference(_T_20,UIntType(IntWidth(32)),NodeKind,SourceFlow),Reference(y,UIntType(IntWidth(32)),ExpKind,DuplexFlow),UIntType(IntWidth(32)))",
+      "sinks": ["~GCD|GCD>_GEN_1"],
+      "declaration": "Mux(Reference(_T_18,UIntType(IntWidth(1)),NodeKind,SourceFlow),Reference(_T_20,UIntType(IntWidth(32)),NodeKind,SourceFlow),Reference(y,UIntType(IntWidth(32)),ExpKind,DuplexFlow),UIntType(IntWidth(32)))"
+    },
+    "~GCD|GCD>_GEN_2": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Reference(_GEN_2,UIntType(IntWidth(32)),ExpKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>x"],
+      "declaration": "DefNode(,_GEN_2,Mux(SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),e,UIntType(IntWidth(1)),SourceFlow),SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),a,UIntType(IntWidth(32)),SourceFlow),Reference(_GEN_0,UIntType(IntWidth(32)),NodeKind,SourceFlow),UIntType(IntWidth(32))))"
+    },
+    "~GCD|GCD>@mux#2": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Mux(SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),e,UIntType(IntWidth(1)),SourceFlow),SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),a,UIntType(IntWidth(32)),SourceFlow),Reference(_GEN_0,UIntType(IntWidth(32)),NodeKind,SourceFlow),UIntType(IntWidth(32)))",
+      "sinks": ["~GCD|GCD>_GEN_2"],
+      "declaration": "Mux(SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),e,UIntType(IntWidth(1)),SourceFlow),SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),a,UIntType(IntWidth(32)),SourceFlow),Reference(_GEN_0,UIntType(IntWidth(32)),NodeKind,SourceFlow),UIntType(IntWidth(32)))"
+    },
+    "~GCD|GCD>io.e": {
+      "kind": "PortKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),e,UIntType(IntWidth(1)),SourceFlow)",
+      "sinks": ["~GCD|GCD>@mux#2", "~GCD|GCD>@mux#3"],
+      "declaration": "Port(,io,Output,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))))"
+    },
+    "~GCD|GCD>io.a": {
+      "kind": "PortKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),a,UIntType(IntWidth(32)),SourceFlow)",
+      "sinks": ["~GCD|GCD>@mux#2"],
+      "declaration": "Port(,io,Output,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))))"
+    },
+    "~GCD|GCD>_GEN_3": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Reference(_GEN_3,UIntType(IntWidth(32)),ExpKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>y"],
+      "declaration": "DefNode(,_GEN_3,Mux(SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),e,UIntType(IntWidth(1)),SourceFlow),SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),b,UIntType(IntWidth(32)),SourceFlow),Reference(_GEN_1,UIntType(IntWidth(32)),NodeKind,SourceFlow),UIntType(IntWidth(32))))"
+    },
+    "~GCD|GCD>@mux#3": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "Mux(SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),e,UIntType(IntWidth(1)),SourceFlow),SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),b,UIntType(IntWidth(32)),SourceFlow),Reference(_GEN_1,UIntType(IntWidth(32)),NodeKind,SourceFlow),UIntType(IntWidth(32)))",
+      "sinks": ["~GCD|GCD>_GEN_3"],
+      "declaration": "Mux(SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),e,UIntType(IntWidth(1)),SourceFlow),SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),b,UIntType(IntWidth(32)),SourceFlow),Reference(_GEN_1,UIntType(IntWidth(32)),NodeKind,SourceFlow),UIntType(IntWidth(32)))"
+    },
+    "~GCD|GCD>io.b": {
+      "kind": "PortKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),b,UIntType(IntWidth(32)),SourceFlow)",
+      "sinks": ["~GCD|GCD>@mux#3"],
+      "declaration": "Port(,io,Output,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))))"
+    },
+    "~GCD|GCD>_T_22": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "Reference(_T_22,UIntType(IntWidth(1)),ExpKind,SourceFlow)",
+      "sinks": ["~GCD|GCD>io.v"],
+      "declaration": "DefNode(,_T_22,DoPrim(eq,ArrayBuffer(Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow), UIntLiteral(0,IntWidth(1))),ArrayBuffer(),UIntType(IntWidth(1))))"
+    },
+    "~GCD|GCD>@eq#1": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "DoPrim(eq,ArrayBuffer(Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow), UIntLiteral(0,IntWidth(1))),ArrayBuffer(),UIntType(IntWidth(1)))",
+      "sinks": ["~GCD|GCD>_T_22"],
+      "declaration": "DoPrim(eq,ArrayBuffer(Reference(y,UIntType(IntWidth(32)),RegKind,SourceFlow), UIntLiteral(0,IntWidth(1))),ArrayBuffer(),UIntType(IntWidth(1)))"
+    },
+    "~GCD|GCD>@0#3": {
+      "kind": "ExpKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "UIntLiteral(0,IntWidth(1))",
+      "sinks": ["~GCD|GCD>@eq#1"],
+      "declaration": "UIntLiteral(0,IntWidth(1))"
+    },
+    "~GCD|GCD>io.z": {
+      "kind": "PortKind",
+      "type": "UIntType(IntWidth(32))",
+      "expr": "SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),z,UIntType(IntWidth(32)),SinkFlow)",
+      "sinks": [],
+      "declaration": "Port(,io,Output,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))))"
+    },
+    "~GCD|GCD>io.v": {
+      "kind": "PortKind",
+      "type": "UIntType(IntWidth(1))",
+      "expr": "SubField(Reference(io,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))),PortKind,SinkFlow),v,UIntType(IntWidth(1)),SinkFlow)",
+      "sinks": [],
+      "declaration": "Port(,io,Output,BundleType(ArrayBuffer(Field(a,Flip,UIntType(IntWidth(32))), Field(b,Flip,UIntType(IntWidth(32))), Field(e,Flip,UIntType(IntWidth(1))), Field(z,Default,UIntType(IntWidth(32))), Field(v,Default,UIntType(IntWidth(1))))))"
+    }
+}

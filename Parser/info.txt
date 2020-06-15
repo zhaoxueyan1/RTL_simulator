@@ -1,0 +1,25 @@
+source:
+reference name of this AST Node
+
+kind:
+    WireKind
+    PoisonKind
+    RegKind
+    InstanceKind
+    PortKind
+    NodeKind
+    MemKind
+    ExpKind
+
+type:
+    ClockType
+    UIntType
+    SIntType
+    ...
+
+flow:
+    SourceFlow
+    SinkFlow
+    DuplexFlow
+    UnknownFlow
+
