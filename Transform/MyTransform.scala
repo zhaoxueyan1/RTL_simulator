@@ -1,35 +1,19 @@
 // See LICENSE for license details.
 
-package tutorial
-package lesson1
 
-// Compiler Infrastructure
 import java.io.{File, FileWriter}
 
-import essent.Driver.setLoggingLevels
-import essent.{ArgsParser, CCCompiler, HarnessGenerator, OptFlags}
+import essent.Emitter.{emitExpr, emitExprWrap, splatLargeLiteralIntoRawArray}
 import firrtl.ir._
-import firrtl.{CircuitState, LowForm, Transform, Utils}
-import net.jcazevedo.moultingyaml.Literal
+import firrtl.{Addw, CircuitState, Dshlw, LowForm, Subw, Transform, Utils, WRef, WSubAccess, WSubField, bitWidth}
 
 import scala.io.Source
-// Firrtl IR classes
-import firrtl.ir.{Circuit, DefModule, Statement, Expression, Mux}
-// Map functions
 import firrtl.Mappers._
-// Scala's mutable collections
+import firrtl.PrimOps.{Add, And, Andr, AsClock, AsSInt, AsUInt, Bits, Cat, Cvt, Div, Dshl, Dshr, Eq, Geq, Gt, Head, Leq, Lt, Mul, Neg, Neq, Not, Or, Orr, Pad, Rem, Shl, Shr, Sub, Tail, Xor, Xorr}
+
 import scala.collection.mutable
 
-/** Ledger tracks [[firrtl.ir.Circuit]] statistics
- *
- * In this lesson, we want to count the number of muxes in each
- *  module in our design.
- *
- * This [[Ledger]] class will be passed along as we walk our
- *  circuit, and help us count each [[Mux]] we find.
- *
- * See [[lesson1.AnalyzeCircuit]]
- */
+
 class Ledger {
   private var moduleName: Option[String] = None
   private val modules = mutable.Set[String]()
@@ -53,81 +37,35 @@ class Ledger {
   }
 }
 
-/** AnalyzeCircuit Transform
- *
- * Walks [[firrtl.ir.Circuit]], and records the number of muxes it finds, per module.
- *
- * While some compiler frameworks operate on graphs, we represent a Firrtl
- * circuit using a tree representation:
- *   - A Firrtl [[Circuit]] contains a sequence of [[DefModule]]s.
- *   - A [[DefModule]] contains a sequence of [[Port]]s, and maybe a [[Statement]].
- *   - A [[Statement]] can contain other [[Statement]]s, or [[Expression]]s.
- *   - A [[Expression]] can contain other [[Expression]]s.
- *
- * To visit all Firrtl IR nodes in a circuit, we write functions that recursively
- *  walk down this tree. To record statistics, we will pass along the [[Ledger]]
- *  class and use it when we come across a [[Mux]].
- *
- * See the following links for more detailed explanations:
- * Firrtl's IR:
- *   - https://github.com/ucb-bar/firrtl/wiki/Understanding-Firrtl-Intermediate-Representation
- * Traversing a circuit:
- *   - https://github.com/ucb-bar/firrtl/wiki/traversing-a-circuit for more
- * Common Pass Idioms:
- *   - https://github.com/ucb-bar/firrtl/wiki/Common-Pass-Idioms
- */
+
 class AnalyzeCircuit extends Transform {
-  // Requires the [[Circuit]] form to be "low"
   def inputForm = LowForm
-  // Indicates the output [[Circuit]] form to be "low"
   def outputForm = LowForm
 
-  // Called by [[Compiler]] to run your pass. [[CircuitState]] contains
-  // the circuit and its form, as well as other related data.
   def execute(state: CircuitState): CircuitState = {
     val ledger = new Ledger()
     val circuit = state.circuit
 
-    // Execute the function walkModule(ledger) on every [[DefModule]] in
-    // circuit, returning a new [[Circuit]] with new [[Seq]] of [[DefModule]].
-    //   - "higher order functions" - using a function as an object
-    //   - "function currying" - partial argument notation
-    //   - "infix notation" - fancy function calling syntax
-    //   - "map" - classic functional programming concept
-    //   - discard the returned new [[Circuit]] because circuit is unmodified
     circuit map walkModule(ledger)
 
-    // Print our ledger
-    println(ledger.serialize)
-
-    // Return an unchanged [[CircuitState]]
     state
   }
 
-  // Deeply visits every [[Statement]] in m.
   def walkModule(ledger: Ledger)(m: DefModule): DefModule = {
-    // Set ledger to current module name
-    //println(m)
     ledger.setModuleName(m.name)
-
-    // Execute the function walkStatement(ledger) on every [[Statement]] in m.
-    //   - return the new [[DefModule]] (in this case, its identical to m)
-    //   - if m does not contain [[Statement]], map returns m.
+    m match {
+      case Module(info, name, ports, body) =>
+        m
+      case ExtModule(info, name, ports, defname, params)=>
+        m
+    }
     m map walkStatement(ledger)
   }
 
-  // Deeply visits every [[Statement]] and [[Expression]] in s.
   def walkStatement(ledger: Ledger)(s: Statement): Statement = {
 
-    // Execute the function walkExpression(ledger) on every [[Expression]] in s.
-    //   - discard the new [[Statement]] (in this case, its identical to s)
-    //   - if s does not contain [[Expression]], map returns s.
-    //println(s)
     s map walkExpression(ledger)
 
-    // Execute the function walkStatement(ledger) on every [[Statement]] in s.
-    //   - return the new [[Statement]] (in this case, its identical to s)
-    //   - if s does not contain [[Statement]], map returns s.
     s map walkStatement(ledger)
 
     s match {
@@ -139,50 +77,125 @@ class AnalyzeCircuit extends Transform {
         println(name)
         println(value)
         s
+      case DefWire(info, name, value)=>
+        println(name)
+        println(value)
+        s
       case Stop(info, ret, clk, en)=>
         s
       case Conditionally(info, pred, conseq, alt)=>
         println(pred)
         println(conseq)
         s
-      case
+      case m : DefMemory =>
+        s
+      case ins : DefInstance =>
+        s
+      case con : Connect =>
+        s
+      case parCon : PartialConnect =>
+        s
+      case invalid : IsInvalid =>
+        s
+      case attach : Attach =>
+        s
+      case stop : DefInstance =>
+        s
+      case p : Print =>
+        val formatters = "(%h)|(%x)|(%d)|(%ld)".r.findAllIn(p.string.serialize).toList
+        val argWidths = p.args map {e: Expression => bitWidth(e.tpe)}
+        if (!(argWidths forall { _ <= 64 })) throw new Exception(s"Can't print wide signals")
+        val replacements = formatters zip argWidths map { case(format, width) =>
+          if (format == "%h" || format == "%x") {
+            val printWidth = math.ceil((width/4).toDouble).toInt
+            (format, s"""%0${printWidth}" PRIx64 """")
+          } else {
+            val printWidth = math.ceil(math.log10((1l<<width.toInt).toDouble)).toInt
+            (format, s"""%${printWidth}" PRIu64 """")
+          }
+        }
+        val formatString = replacements.foldLeft(p.string.serialize){
+          case (str, (searchFor, replaceWith)) => str.replaceFirst(searchFor, replaceWith)
+        }
+        val printfArgs = Seq(s""""$formatString"""") ++
+          (p.args map {arg => s"${emitExprWrap(arg)}.as_single_word()"})
+        Seq(s"if (UNLIKELY(done_reset && update_registers && verbose && ${emitExprWrap(p.en)})) printf(${printfArgs mkString(", ")});")
+        s
       case _ => s
     }
   }
 
-  // Deeply visits every [[Expression]] in e.
-  //   - "post-order traversal" - handle e's children [[Expression]] before e
   def walkExpression(ledger: Ledger)(e: Expression): Expression = {
-
-    // Execute the function walkExpression(ledger) on every [[Expression]] in e.
-    //   - return the new [[Expression]] (in this case, its identical to e)
-    //   - if s does not contain [[Expression]], map returns e.
-    //println(e)
-    val visited = e map walkExpression(ledger)
-
-    visited match {
-      // If e is a [[Mux]], increment our ledger and return e.
-      case Mux(cond, tval, fval, tpe) =>
-        ledger.foundMux
-        e
-      // If e is not a [[Mux]], return e.
-      case DoPrim(op, args, consts, tpe) =>
-        println(op)
-        println(args)
-        e
-      case UIntLiteral(value,width) =>
-        e
-
-      case _ => e
+    case w: WRef => w.name
+    case u: UIntLiteral => {
+      val maxIn64Bits = (BigInt(1) << 64) - 1
+      val width = bitWidth(u.tpe)
+      val asHexStr = u.value.toString(16)
+      if ((width <= 64) || (u.value <= maxIn64Bits)) s"UInt<$width>(0x$asHexStr)"
+      else s"UInt<$width>(${splatLargeLiteralIntoRawArray(u.value, width)})"
     }
+    case u: SIntLiteral => {
+      val width = bitWidth(u.tpe)
+      if (width <= 64) s"SInt<$width>(${u.value.toString(10)})"
+      else s"SInt<$width>(${splatLargeLiteralIntoRawArray(u.value, width)})"
+    }
+    case m: Mux => {
+      val condName = emitExprWrap(m.cond)
+      val tvalName = emitExprWrap(m.tval)
+      val fvalName = emitExprWrap(m.fval)
+      s"$condName ? $tvalName : $fvalName"
+    }
+    case w: WSubField => s"${emitExpr(w.expr)}.${w.name}"
+    case w: WSubAccess => s"${emitExpr(w.expr)}[${emitExprWrap(w.index)}.as_single_word()]"
+    case p: DoPrim => p.op match {
+      case Add => p.args map emitExprWrap mkString(" + ")
+      case Addw=> s"${emitExprWrap(p.args(0))}.addw(${emitExprWrap(p.args(1))})"
+      case Sub => p.args map emitExprWrap mkString(" - ")
+      case Subw=> s"${emitExprWrap(p.args(0))}.subw(${emitExprWrap(p.args(1))})"
+      case Mul => p.args map emitExprWrap mkString(" * ")
+      case Div => p.args map emitExprWrap mkString(" / ")
+      case Rem => p.args map emitExprWrap mkString(" % ")
+      case Lt  => p.args map emitExprWrap mkString(" < ")
+      case Leq => p.args map emitExprWrap mkString(" <= ")
+      case Gt  => p.args map emitExprWrap mkString(" > ")
+      case Geq => p.args map emitExprWrap mkString(" >= ")
+      case Eq  => p.args map emitExprWrap mkString(" == ")
+      case Neq => p.args map emitExprWrap mkString(" != ")
+      case Pad => s"${emitExprWrap(p.args.head)}.pad<${bitWidth(p.tpe)}>()"
+      case AsUInt => s"${emitExprWrap(p.args.head)}.asUInt()"
+      case AsSInt => s"${emitExprWrap(p.args.head)}.asSInt()"
+      case AsClock => throw new Exception("AsClock unimplemented!")
+      case Shl  => s"${emitExprWrap(p.args.head)}.shl<${p.consts.head.toInt}>()"
+      //case Shlw => s"${emitExprWrap(p.args.head)}.shlw<${p.consts.head.toInt}>()"
+      case Shr  => s"${emitExprWrap(p.args.head)}.shr<${p.consts.head.toInt}>()"
+      case Dshl => p.args map emitExprWrap mkString(" << ")
+      case Dshlw => s"${emitExprWrap(p.args(0))}.dshlw(${emitExpr(p.args(1))})"
+      case Dshr => p.args map emitExprWrap mkString(" >> ")
+      case Cvt  => s"${emitExprWrap(p.args.head)}.cvt()"
+      case Neg  => s"-${emitExprWrap(p.args.head)}"
+      case Not  => s"~${emitExprWrap(p.args.head)}"
+      case And  => p.args map emitExprWrap mkString(" & ")
+      case Or   => p.args map emitExprWrap mkString(" | ")
+      case Xor  => p.args map emitExprWrap mkString(" ^ ")
+      case Andr => s"${emitExprWrap(p.args.head)}.andr()"
+      case Orr  => s"${emitExprWrap(p.args.head)}.orr()"
+      case Xorr => s"${emitExprWrap(p.args.head)}.xorr()"
+      case Cat  => s"${emitExprWrap(p.args(0))}.cat(${emitExpr(p.args(1))})"
+      case Bits => s"${emitExprWrap(p.args.head)}.bits<${p.consts(0).toInt},${p.consts(1).toInt}>()"
+      case Head => s"${emitExprWrap(p.args.head)}.head<${p.consts.head.toInt}>()"
+      case Tail => s"${emitExprWrap(p.args.head)}.tail<${p.consts.head.toInt}>()"
+    }
+    case _ => throw new Exception(s"Don't yet support $e")
+
+    e map walkExpression(ledger)
+
   }
 }
 
 object Main{
   def main(array: Array[String]) = {
-    generate(new File("./gcd.fir"))
+    generate(new File("./firrtl/Top.fir"))
   }
-
   def generate(inputFile: File) {
     val circuit = firrtl.Parser.parse(Source.fromFile(inputFile).getLines,
       firrtl.Parser.IgnoreInfo)
@@ -190,5 +203,4 @@ object Main{
     var analyzeCircuit = new AnalyzeCircuit()
     analyzeCircuit.execute(CircuitState(circuit, firrtl.ChirrtlForm))
   }
-
 }
