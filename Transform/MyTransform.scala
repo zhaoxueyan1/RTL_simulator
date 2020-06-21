@@ -5,11 +5,12 @@ import java.io.{File, FileWriter}
 
 import essent.Emitter.{emitExpr, emitExprWrap, splatLargeLiteralIntoRawArray}
 import firrtl.ir._
-import firrtl.{Addw, CircuitState, Dshlw, LowForm, Subw, Transform, Utils, WRef, WSubAccess, WSubField, bitWidth}
+import firrtl.{Addw, CircuitState, Dshlw, HighFirrtlToMiddleFirrtl, LowFirrtlOptimization, LowForm, MiddleFirrtlToLowFirrtl, Subw, Transform, Utils, WRef, WSubAccess, WSubField, bitWidth}
 
 import scala.io.Source
 import firrtl.Mappers._
 import firrtl.PrimOps.{Add, And, Andr, AsClock, AsSInt, AsUInt, Bits, Cat, Cvt, Div, Dshl, Dshr, Eq, Geq, Gt, Head, Leq, Lt, Mul, Neg, Neq, Not, Or, Orr, Pad, Rem, Shl, Shr, Sub, Tail, Xor, Xorr}
+import firrtl.stage.{Forms, TransformManager}
 
 import scala.collection.mutable
 
@@ -64,7 +65,7 @@ class AnalyzeCircuit extends Transform {
 
   def walkStatement(ledger: Ledger)(s: Statement): Statement = {
 
-    s map walkExpression(ledger)
+    //s map walkExpression(ledger)
 
     s map walkStatement(ledger)
 
@@ -89,11 +90,11 @@ class AnalyzeCircuit extends Transform {
         s
       case m : DefMemory =>
         s
-      case ins : DefInstance =>
+      case instance : DefInstance =>
         s
-      case con : Connect =>
+      case connect : Connect =>
         s
-      case parCon : PartialConnect =>
+      case partialConnect : PartialConnect =>
         s
       case invalid : IsInvalid =>
         s
@@ -125,7 +126,12 @@ class AnalyzeCircuit extends Transform {
     }
   }
 
-  def walkExpression(ledger: Ledger)(e: Expression): Expression = {
+  def emitExprWrap(e: Expression): String = e match {
+    case DoPrim(_,_,_,_) | Mux(_,_,_,_) => s"(${emitExpr(e)})"
+    case _ => emitExpr(e)
+  }
+
+  def walkExpression(ledger: Ledger)(e: Expression): String = e match {
     case w: WRef => w.name
     case u: UIntLiteral => {
       val maxIn64Bits = (BigInt(1) << 64) - 1
@@ -187,20 +193,24 @@ class AnalyzeCircuit extends Transform {
     }
     case _ => throw new Exception(s"Don't yet support $e")
 
-    e map walkExpression(ledger)
-
   }
 }
 
 object Main{
   def main(array: Array[String]) = {
-    generate(new File("./firrtl/Top.fir"))
+    generate(new File("./firrtl/gcd.fir"))
   }
   def generate(inputFile: File) {
     val circuit = firrtl.Parser.parse(Source.fromFile(inputFile).getLines,
       firrtl.Parser.IgnoreInfo)
     val  topName = circuit.main
-    var analyzeCircuit = new AnalyzeCircuit()
-    analyzeCircuit.execute(CircuitState(circuit, firrtl.ChirrtlForm))
+    var state = CircuitState(circuit, firrtl.HighForm)
+    val analyzeCircuit = new AnalyzeCircuit()
+    val HighToMid = new HighFirrtlToMiddleFirrtl()
+    val MidToLow = new MiddleFirrtlToLowFirrtl()
+
+    state = HighToMid.execute(state)
+    state = MidToLow.execute(state)
+    analyzeCircuit.execute(state)
   }
 }
