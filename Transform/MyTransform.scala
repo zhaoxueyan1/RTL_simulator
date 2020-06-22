@@ -5,7 +5,7 @@ import java.io.{File, FileWriter}
 
 import essent.Emitter.{emitExpr, emitExprWrap, splatLargeLiteralIntoRawArray}
 import firrtl.ir._
-import firrtl.{Addw, CircuitState, Dshlw, HighFirrtlToMiddleFirrtl, LowFirrtlOptimization, LowForm, MiddleFirrtlToLowFirrtl, Subw, Transform, Utils, WRef, WSubAccess, WSubField, bitWidth}
+import firrtl.{Addw, ChirrtlToHighFirrtl, CircuitState, Dshlw, HighFirrtlToMiddleFirrtl, IRToWorkingIR, LowFirrtlOptimization, LowForm, MiddleFirrtlToLowFirrtl, ResolveAndCheck, Subw, Transform, Utils, WRef, WSubAccess, WSubField, bitWidth}
 
 import scala.io.Source
 import firrtl.Mappers._
@@ -71,22 +71,22 @@ class AnalyzeCircuit extends Transform {
 
     s match {
       case DefRegister(info, name, tpe, clock, reset, init)=>
-        println(name)
-        println(tpe)
+//        println(name)
+//        println(tpe)
         s
       case DefNode(info, name, value)=>
         println(name)
-        println(value)
+//        println(value)
         s
       case DefWire(info, name, value)=>
         println(name)
-        println(value)
+//        println(value)
         s
       case Stop(info, ret, clk, en)=>
         s
       case Conditionally(info, pred, conseq, alt)=>
-        println(pred)
-        println(conseq)
+        println(s)
+//        println(conseq)
         s
       case m : DefMemory =>
         s
@@ -153,7 +153,9 @@ class AnalyzeCircuit extends Transform {
     }
     case w: WSubField => s"${emitExpr(w.expr)}.${w.name}"
     case w: WSubAccess => s"${emitExpr(w.expr)}[${emitExprWrap(w.index)}.as_single_word()]"
-    case p: DoPrim => p.op match {
+    case p: DoPrim =>
+      println(p)
+      p.op match {
       case Add => p.args map emitExprWrap mkString(" + ")
       case Addw=> s"${emitExprWrap(p.args(0))}.addw(${emitExprWrap(p.args(1))})"
       case Sub => p.args map emitExprWrap mkString(" - ")
@@ -197,20 +199,28 @@ class AnalyzeCircuit extends Transform {
 }
 
 object Main{
+
   def main(array: Array[String]) = {
     generate(new File("./firrtl/gcd.fir"))
   }
-  def generate(inputFile: File) {
-    val circuit = firrtl.Parser.parse(Source.fromFile(inputFile).getLines,
-      firrtl.Parser.IgnoreInfo)
-    val  topName = circuit.main
-    var state = CircuitState(circuit, firrtl.HighForm)
-    val analyzeCircuit = new AnalyzeCircuit()
-    val HighToMid = new HighFirrtlToMiddleFirrtl()
-    val MidToLow = new MiddleFirrtlToLowFirrtl()
 
-    state = HighToMid.execute(state)
-    state = MidToLow.execute(state)
+  def generate(inputFile: File) {
+    //val a= new LoweringCompilers
+    val circuit = firrtl.Parser.parse(Source.fromFile(inputFile).getLines,
+        firrtl.Parser.IgnoreInfo)
+    val  topName = circuit.main
+    var state = CircuitState(circuit,firrtl.HighForm)
+    println(state.form)
+
+    val analyzeCircuit = new AnalyzeCircuit()
+
+    val irToWorkingIR = new TransformManager(Forms.WorkingIR, Forms.MinimalHighForm)
+    state = irToWorkingIR.execute(state)
+    val compiler = new firrtl.stage.transforms.Compiler(
+      targets=firrtl.stage.Forms.LowForm,
+      currentState=firrtl.stage.Forms.MinimalHighForm
+    )
+    state = compiler.transform(state)
     analyzeCircuit.execute(state)
   }
 }
