@@ -19,7 +19,7 @@ class Graph {
     //  private var moduleName: Option[String] = None
 //    private var RegSet = mutable.Seq[DefRegister]()
     var RegSet = mutable.Set[String]()
-    private var WireSet = mutable.Seq[DefWire]()
+    var RSet = mutable.Seq[DefRegister]()
     private var NodeSet = mutable.Seq[DefNode]()
     private var InputPort = mutable.Seq[Port]()
     private var OutputPort = mutable.Seq[Port]()
@@ -29,13 +29,11 @@ class Graph {
 
 
     def PushReg(defRegister: DefRegister) = RegSet.add(defRegister.name)
-    def PushWire(defWire: DefWire)  =WireSet:+defWire
+//    def PushWire(defWire: DefWire)  =WireSet:+defWire
     def PushNode(defNode: DefNode)  =NodeSet:+defNode
     def addEdge(str1:String,str2:String)=HeadMap+=(str1->str2)
     def Output()={
-        println(HeadMap)
-        println(DetailStrMap)
-        HeadMap.foreach(e=>{if(RegSet.contains(e._1)) println(e)})
+        HeadMap.foreach(e=>{if(RegSet.contains(e._1)) println(e._1+" = "+e._2)})
     }
     def serialize: String = {
         return  "\n"
@@ -84,8 +82,6 @@ class AnalyzeCircuit extends Transform {
 
 //        s map emitExpr
 
-        s map walkStatement(graph)
-        //    println(s)
         s match {
             case DefRegister(info, name, tpe, clock, reset, init)=>
                 graph.RegSet.add(name)
@@ -93,7 +89,7 @@ class AnalyzeCircuit extends Transform {
                 //        println(tpe)
                 s
             case DefNode(info, name, value)=>
-                //        println(name)
+//                println(name)
                 //        println(value)
                 graph.addEdge(name,emitExpr(value))
                 graph.DetailMap+=(name->value)
@@ -113,8 +109,15 @@ class AnalyzeCircuit extends Transform {
             case instance : DefInstance =>
                 s
             case connect : Connect =>
+//                println(connect)
                 graph.addEdge(emitExpr(connect.loc),emitExpr(connect.expr))
-                graph.DetailStrMap+=(emitExpr(connect.loc)->emitExpr(connect.expr))
+                if (!graph.RegSet.contains(emitExpr(connect.loc))){
+                    connect.loc match {
+                        case WRef(name, tpe, kind, flow)=>
+                            graph.DetailMap+=(name->connect.expr)
+                    }
+                }
+
                 s
             case partialConnect : PartialConnect =>
                 s
@@ -146,24 +149,24 @@ class AnalyzeCircuit extends Transform {
                 s
             case _ => s
         }
+        s map walkStatement(graph)
     }
 
     def emitExprWrap(e: Expression): String = {
         //    println(e)
         e match {
             case DoPrim(_,_,_,_) | Mux(_,_,_,_) => s"(${emitExpr(e)})"
-            case WRef(name,_,_,_) =>
-                if(graph.DetailMap.contains(name))
-                    s"(${emitExpr(graph.DetailMap(name))})"
-                else
-                    emitExpr(e)
             case _ => emitExpr(e)
         }
     }
 
     def emitExpr(e: Expression): String = {
         e match {
-            case w: WRef => w.name
+            case WRef(name,_,_,_) =>
+                if(graph.DetailMap.contains(name))
+                    s"(${emitExpr(graph.DetailMap(name))})"
+                else
+                    name
             case u: UIntLiteral => {
                 val maxIn64Bits = (BigInt(1) << 64) - 1
                 val width = bitWidth(u.tpe)
