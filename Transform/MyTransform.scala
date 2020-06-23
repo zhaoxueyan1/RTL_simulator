@@ -3,7 +3,7 @@
 
 import java.io.{File, FileWriter}
 
-import essent.Emitter.{emitExpr, emitExprWrap, splatLargeLiteralIntoRawArray}
+
 import firrtl.ir._
 import firrtl.{Addw, ChirrtlToHighFirrtl, CircuitState, Dshlw, HighFirrtlToMiddleFirrtl, IRToWorkingIR, LowFirrtlOptimization, LowForm, MiddleFirrtlToLowFirrtl, ResolveAndCheck, Subw, Transform, Utils, WRef, WSubAccess, WSubField, bitWidth}
 
@@ -17,18 +17,25 @@ import scala.collection.mutable
 
 class Graph {
     //  private var moduleName: Option[String] = None
-    private var RegSet = mutable.Seq[DefRegister]()
-    private var CombSet = mutable.Seq[DefWire]()
+//    private var RegSet = mutable.Seq[DefRegister]()
+    var RegSet = mutable.Set[String]()
+    private var WireSet = mutable.Seq[DefWire]()
     private var NodeSet = mutable.Seq[DefNode]()
+    private var InputPort = mutable.Seq[Port]()
+    private var OutputPort = mutable.Seq[Port]()
     private var HeadMap = mutable.Map[String, String]()
+    var DetailMap = mutable.Map[String, Expression]()
+    var DetailStrMap = mutable.Map[String, String]()
 
 
-    def PushReg(defRegister: DefRegister) = RegSet:+defRegister
-    def PushWire(defWire: DefWire)  =RegSet:+defWire
-    def PushNode(defNode: DefNode)  =RegSet:+defNode
-
+    def PushReg(defRegister: DefRegister) = RegSet.add(defRegister.name)
+    def PushWire(defWire: DefWire)  =WireSet:+defWire
+    def PushNode(defNode: DefNode)  =NodeSet:+defNode
+    def addEdge(str1:String,str2:String)=HeadMap+=(str1->str2)
     def Output()={
-
+        println(HeadMap)
+        println(DetailStrMap)
+        HeadMap.foreach(e=>{if(RegSet.contains(e._1)) println(e)})
     }
     def serialize: String = {
         return  "\n"
@@ -44,9 +51,19 @@ class AnalyzeCircuit extends Transform {
     def execute(state: CircuitState): CircuitState = {
         val circuit = state.circuit
         circuit map walkModule(graph)
+        graph.Output()
         state
     }
-
+    def walkModule(graph: Graph)(m: DefModule): DefModule = {
+        //graph.Graph(m.name)
+        m match {
+            case Module(info, name, ports, body) =>
+                ports.filter(e=>e.direction==Output).foreach(e=>graph.RegSet.add(e.name))
+            case ExtModule(info, name, ports, defname, params)=>
+                m
+        }
+        m map walkStatement(graph)
+    }
     def chunkLitString(litStr: String, chunkWidth:Int = 16): Seq[String] = {
         if (litStr.size < chunkWidth) Seq(litStr)
         else chunkLitString(litStr.dropRight(chunkWidth)) ++ Seq(litStr.takeRight(chunkWidth))
@@ -63,31 +80,23 @@ class AnalyzeCircuit extends Transform {
         s"std::array<uint64_t,$numWords>({$leadingNegStr$arrStr})"
     }
 
-    def walkModule(graph: Graph)(m: DefModule): DefModule = {
-        //graph.Graph(m.name)
-        m match {
-            case Module(info, name, ports, body) =>
-                m
-            case ExtModule(info, name, ports, defname, params)=>
-                m
-        }
-        m map walkStatement(graph)
-    }
-
     def walkStatement(graph: Graph)(s: Statement): Statement = {
 
-        s map emitExpr
+//        s map emitExpr
 
         s map walkStatement(graph)
         //    println(s)
         s match {
             case DefRegister(info, name, tpe, clock, reset, init)=>
+                graph.RegSet.add(name)
                 //        println(name)
                 //        println(tpe)
                 s
             case DefNode(info, name, value)=>
                 //        println(name)
                 //        println(value)
+                graph.addEdge(name,emitExpr(value))
+                graph.DetailMap+=(name->value)
                 s
             case DefWire(info, name, value)=>
                 //        println(name)
@@ -104,7 +113,8 @@ class AnalyzeCircuit extends Transform {
             case instance : DefInstance =>
                 s
             case connect : Connect =>
-                println(connect.loc,connect.expr)
+                graph.addEdge(emitExpr(connect.loc),emitExpr(connect.expr))
+                graph.DetailStrMap+=(emitExpr(connect.loc)->emitExpr(connect.expr))
                 s
             case partialConnect : PartialConnect =>
                 s
@@ -142,10 +152,14 @@ class AnalyzeCircuit extends Transform {
         //    println(e)
         e match {
             case DoPrim(_,_,_,_) | Mux(_,_,_,_) => s"(${emitExpr(e)})"
+            case WRef(name,_,_,_) =>
+                if(graph.DetailMap.contains(name))
+                    s"(${emitExpr(graph.DetailMap(name))})"
+                else
+                    emitExpr(e)
             case _ => emitExpr(e)
         }
     }
-
 
     def emitExpr(e: Expression): String = {
         e match {
@@ -167,13 +181,19 @@ class AnalyzeCircuit extends Transform {
                 val condName = emitExprWrap(m.cond)
                 val tvalName = emitExprWrap(m.tval)
                 val fvalName = emitExprWrap(m.fval)
-                println(s"$condName ? $tvalName : $fvalName")
+                s"$condName ? $tvalName : $fvalName"
             }
-            case w: WSubField => s"${emitExpr(w.expr)}.${w.name}"
+            case vif: ValidIf => {
+                //println(m)
+                val condName = emitExprWrap(vif.cond)
+                val tvalName = emitExprWrap(vif.value)
+                s"$condName ? $tvalName : 0"
+            }
+            case w: WSubField => s"${emitExpr(w.expr)}_${w.name}"
             case w: WSubAccess => s"${emitExpr(w.expr)}[${emitExprWrap(w.index)}.as_single_word()]"
             case p: DoPrim =>
-                println(p.op)
-                println(p.args)
+//                println(p.op)
+//                println(p.args)
                 p.op match {
                     case Add => p.args map emitExprWrap mkString(" + ")
                     case Addw=> s"${emitExprWrap(p.args(0))}.addw(${emitExprWrap(p.args(1))})"
@@ -216,6 +236,8 @@ class AnalyzeCircuit extends Transform {
 
         }
     }
+
+
 }
 
 object Main{
