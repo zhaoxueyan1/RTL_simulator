@@ -10,7 +10,6 @@ typedef pair<int, void*>P;
 
 namespace Simulator {
 
-
 	set<P>SetS;
 	queue<int>TransQueue;
 	void Init(int N) {
@@ -121,7 +120,7 @@ namespace Simulator {
 		//RegTrans();
 	}
 }
-# if 1
+# if 0
 int Data[] = { 0,1,2,3,4 };
 int main() {
 	Simulator::Init(4);

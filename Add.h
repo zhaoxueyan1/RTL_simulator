@@ -38,7 +38,6 @@ public:
 
 class Mul :protected Comb {
 public:
-	static Mul *ptr;
 	Mul(int id, int dtype, int nxtNum, int pre_num)
 		:Comb(id, dtype, pre_num, nxtNum) {
 	}
