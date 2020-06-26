@@ -13,7 +13,7 @@ namespace Generate {
 		nxtTbl->push_back(2);
 		nxtTbl->push_back(3);
 
-		(*Node::AllSet).push_back(Reg::Create(0,4,0,2,preTbl,nxtTbl));
+		(*Node::AllSet).push_back(Reg::Create(0,4,0,2,preTbl));
 		
 		preTbl = new vector<int>;
 		nxtTbl = new vector<int>;
@@ -23,7 +23,7 @@ namespace Generate {
 		//preTbl->push_back();
 		//nxtTbl->push_back(1);
 
-		(*Node::AllSet).push_back(Reg::Create(1, 4, 1, 1, preTbl, nxtTbl));
+		(*Node::AllSet).push_back(Reg::Create(1, 4, 1, 1, preTbl));
 	
 
 		preTbl = new vector<int>;

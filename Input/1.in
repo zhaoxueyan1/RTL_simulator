@@ -1,0 +1,12 @@
+11
+9 Comb UInt<32> -1 Node9 (*(UInt<1>*)((*Node::AllSet)[2]->Data) ? *(UInt<32>*)((*Node::AllSet)[0]->Data) : ((*(UInt<32>*)((*Node::AllSet)[5]->Data) > *(UInt<32>*)((*Node::AllSet)[6]->Data)) ? ((((*(UInt<32>*)((*Node::AllSet)[5]->Data) - *(UInt<32>*)((*Node::AllSet)[6]->Data)) + *(UInt<32>*)((*Node::AllSet)[6]->Data)) - *(UInt<32>*)((*Node::AllSet)[6]->Data)).tail<1>()) : *(UInt<32>*)((*Node::AllSet)[5]->Data))).bits<31,0>()
+2 Port UInt<1> Input io_e 2
+3 Port UInt<32> Output io_z 7
+8 Comb UInt<1> -1 Node8 (*(UInt<32>*)((*Node::AllSet)[6]->Data) == UInt<1>(0x0))
+6 Reg UInt<32> -1 y 10
+1 Port UInt<32> Input io_b 1
+10 Comb UInt<32> -1 Node10 (*(UInt<1>*)((*Node::AllSet)[2]->Data) ? *(UInt<32>*)((*Node::AllSet)[1]->Data) : (((*(UInt<32>*)((*Node::AllSet)[5]->Data) > *(UInt<32>*)((*Node::AllSet)[6]->Data)) == UInt<1>(0x0)) ? ((*(UInt<32>*)((*Node::AllSet)[6]->Data) - *(UInt<32>*)((*Node::AllSet)[5]->Data)).tail<1>()) : *(UInt<32>*)((*Node::AllSet)[6]->Data)))
+5 Reg UInt<32> -1 x 9
+4 Port UInt<1> Output io_v 8
+7 Comb UInt<32> -1 Node7 *(UInt<32>*)((*Node::AllSet)[5]->Data)
+0 Port UInt<32> Input io_a 0

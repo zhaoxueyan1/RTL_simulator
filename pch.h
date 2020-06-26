@@ -8,6 +8,7 @@
 
 #ifndef PCH_H
 #define PCH_H
+#define _CRT_SECURE_NO_WARNINGS
 
 #include<iostream>
 #include<vector>
@@ -17,6 +18,7 @@
 #include<unordered_map>
 #include<queue>
 #include<set>
+
 #define UINT_8 unsigned char
 #define UINT_16 unsigned short
 #define UINT_32 unsigned int

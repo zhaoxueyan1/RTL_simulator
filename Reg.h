@@ -14,10 +14,9 @@ public:
 		return this->Data;
 	}
 	void setData();
-	static Node * Create(int id, int dtype, int nxtNum, int pre_num, vector<int>* preTbl, vector<int>* nxtTbl) {
-		Node * ptr = new Reg(id, dtype, nxtNum, pre_num);
+	static Node * Create(int id, int dtype, int nxtNum, int pre_num, vector<int>* preTbl) {
+		Node * ptr = new Reg(id, dtype, nxtNum, 1);
 		ptr->preTbl = preTbl;
-		ptr->nxtTbl = nxtTbl;
 		return ptr;
 	}
 };

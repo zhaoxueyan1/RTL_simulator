@@ -3,7 +3,7 @@
 #include "Reg.h"
 #include "ReOrder.h"
 #include "Comb.h"
-#include "GenerateNode.h"
+#include "List.h"
 
 using namespace std;
 typedef pair<int, void*>P;
