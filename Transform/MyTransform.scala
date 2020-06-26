@@ -13,14 +13,19 @@ import firrtl.PrimOps.{Add, And, Andr, AsClock, AsSInt, AsUInt, Bits, Cat, Cvt, 
 import firrtl.stage.{Forms, TransformManager}
 
 import scala.collection.mutable
-
+class Node(var name:String,
+           var cppType:String,
+           var ind:String,
+           var dir:String,
+           var tpe:String,
+           var expr:String
+          )
 
 class Graph {
-    //  private var moduleName: Option[String] = None
-//    private var RegSet = mutable.Seq[DefRegister]()
+
     var RegSet = mutable.Set[String]()
     var RSet = mutable.Seq[DefRegister]()
-    var PSet = mutable.Seq[Port]()
+    var NodeMP = mutable.Map[String, Node]()
     var cnt = 0
     var flag = false
     private var NodeSet = mutable.Seq[DefNode]()
@@ -30,28 +35,18 @@ class Graph {
     var DetailMap = mutable.Map[String, Expression]()
     var DetailStrMap = mutable.Map[String, Seq[String]]()
 
-
-    def PushReg(defRegister: DefRegister) = RegSet.add(defRegister.name)
-//    def PushWire(defWire: DefWire)  =WireSet:+defWire
     def PushNode(defNode: DefNode)  =NodeSet:+defNode
     def addEdge(str1:String,str2:String)=HeadMap+=(str1->str2)
     def Output()={
-
-        HeadMap.foreach(e=>{if(RegSet.contains(e._1)) println(e._1+" = "+e._2)})
-
-        HeadNumMap.foreach(e=>{println(e._1+" = "+e._2)})
-
-        MP.foreach(e=>{println(e._1+" -> "+e._2)})
-
-        println(PSet.size)
-        PSet.foreach(e=>{println(s"${e.name},${e.tpe},${e.direction},${MP(e.name)}")})
-
-        println(RSet.size)
-        RSet.foreach(e=>{println(s"${e.name},${e.tpe},${MP(e.name)}")})
+        NodeMP.foreach((e)=>{
+            val t = e._2
+            println(t.ind,t.tpe,t.cppType,t.dir,t.name,t.expr)
+        })
     }
     def serialize: String = {
         return  "\n"
     }
+
 }
 
 
@@ -73,8 +68,8 @@ class AnalyzeCircuit extends Transform {
                 ports.foreach(e=>{
                     if(e.name!="clock"&&e.name!="reset") {
                         graph.MP+=(e.name->graph.cnt)
+                        graph.NodeMP+=(e.name->new Node(e.name,Main.genCppType(e.tpe),s"${graph.cnt}",e.direction.toString,"Port","skip"))
                         graph.cnt+=1
-                        graph.PSet:+=e
                     }
                     if(e.direction==Output)
                         graph.RegSet.add(e.name)
@@ -102,12 +97,11 @@ class AnalyzeCircuit extends Transform {
 
     def walkStatement(graph: Graph)(s: Statement): Statement = {
 
-//        s map emitExpr
-
         s match {
             case r:DefRegister=>
                 graph.RegSet.add(r.name)
                 graph.MP+=(r.name->graph.cnt)
+                graph.NodeMP+=(r.name->new Node(r.name,Main.genCppType(r.tpe),s"${graph.cnt}","-1","Reg","skip"))
                 graph.cnt+=1
                 graph.RSet:+=r
                 //println(name)
@@ -133,14 +127,21 @@ class AnalyzeCircuit extends Transform {
                 s
             case instance : DefInstance =>
                 s
-            case connect : Connect =>
-                graph.addEdge(emitExpr(connect.loc),emitExpr(connect.expr))
+            case connect : Connect => //等式左边
+                val name = emitExpr(connect.loc)
+                graph.addEdge(name,emitExpr(connect.expr))
                 if (!graph.RegSet.contains(emitExpr(connect.loc))){
                     graph.DetailMap+=(emitExpr(connect.loc)->connect.expr)
                 }
                 else{
                     graph.flag = true
-                    graph.HeadNumMap+=(emitExpr(connect.loc)->emitExpr(connect.expr))
+                    val expr = emitExpr(connect.expr)
+                    val nodeName = s"Node${graph.cnt}"
+                    graph.NodeMP(name).expr = nodeName
+                    graph.MP+=(nodeName->graph.cnt)
+                    graph.NodeMP+=(nodeName->new Node(nodeName,graph.NodeMP(name).tpe,s"${graph.cnt}","-1","Comb",expr))
+                    graph.cnt+=1
+                    graph.HeadNumMap+=(name->expr)
                     graph.flag = false
                 }
                 s
@@ -187,11 +188,11 @@ class AnalyzeCircuit extends Transform {
 
     def emitExpr(e: Expression): String = {
         e match {
-            case WRef(name,_,_,_) =>
+            case WRef(name,tpe,_,_) =>
                 if(graph.DetailMap.contains(name))
                     s"(${emitExpr(graph.DetailMap(name))})"
                 else if(graph.MP.contains(name)&&graph.flag)
-                    s"${graph.MP.get(name).get}"
+                    s"*(${Main.genCppType(tpe)}*)((*Node::AllSet)[${graph.MP(name)}]->Data)"
                 else
                     name
             case u: UIntLiteral => {
@@ -267,12 +268,12 @@ class AnalyzeCircuit extends Transform {
 
     def emitRPN(e: Expression)(res: Seq[String]): Unit = {
         e match {
-            case WRef(name,_,_,_) =>
+            case WRef(name,tpe,_,_) =>
                 if(graph.DetailMap.contains(name))
                     emitRPN(graph.DetailMap(name))(res)
                 else if(graph.MP.contains(name)&&graph.flag)
 //                    emitRPN(graph.MP.get(name).get)(res)
-                    res:+s"${graph.MP(name)}"
+                    res:+s"*(${Main.genCppType(tpe)}*)((*Node::AllSet)[${graph.MP(name)}]->Data)"
                 else  res:+name
             case u: UIntLiteral => {
                 val maxIn64Bits = (BigInt(1) << 64) - 1
@@ -348,6 +349,11 @@ class AnalyzeCircuit extends Transform {
 }
 
 object Main{
+    def genCppType(tpe: Type) = tpe match {
+        case UIntType(IntWidth(w)) => s"UInt<$w>"
+        case SIntType(IntWidth(w)) => s"SInt<$w>"
+        case _ => throw new Exception(s"No CPP type implemented for $tpe")
+    }
 
     def main(array: Array[String]) = {
         generate(new File("./firrtl/gcd.fir"))
