@@ -5,10 +5,6 @@
 #include"Add.h"
 
 namespace Generate {
-	//Gptr[cnt++] = t;
-	//MP["Add"] = t 
-	/*
-	*/
 	void GenerateNode() {
 		vector<int> * preTbl = new vector<int>;
 		vector<int> * nxtTbl = new vector<int>;

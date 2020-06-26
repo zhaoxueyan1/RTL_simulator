@@ -10,8 +10,8 @@ Node::Node(int id, int dType, int nxtNum, int preNum)
 {
 	preTbl = new vector<int>;
 	nxtTbl = new vector<int>;
-	this->Data = malloc(dType);
-	memset(this->Data, 0, dType);
+	//this->Data = malloc(dType);
+	//memset(this->Data, 0, dType);
 	//Node::N++;
 }
 

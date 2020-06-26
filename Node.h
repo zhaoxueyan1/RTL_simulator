@@ -5,7 +5,7 @@ using namespace std;
 
 class Node {
 
-protected:
+public:
 	void * Data; // the data of this register
 
 public:

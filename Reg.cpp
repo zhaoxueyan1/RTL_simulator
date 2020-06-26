@@ -9,6 +9,5 @@ void Reg::setData()
 {
 	/*if (!this->Data)
 		free(this->Data);*/
-
-	memcpy(this->Data,(Node::Gptr+((*this->preTbl)[0]))->GetData(),this->dType);
+	memcpy(this->Data,(*Node::AllSet)[(*this->preTbl)[0]]->Data,dType);
 }
