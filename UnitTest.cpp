@@ -3,7 +3,7 @@
 #include "Type.h"
 
 
-#if 1
+#if 0
 using namespace std;
 
 int main() {

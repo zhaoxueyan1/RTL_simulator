@@ -1,10 +1,11 @@
 #include"pch.h"
-#include"RTL_simulator.cpp"
 
-using namespace std;
 
 #if 0
 
+#include"RTL_simulator.cpp"
+
+using namespace std;
 int Data[] = { 0,1,2,3,4 };
 int main() {
 	Simulator::Init(4);
@@ -20,4 +21,5 @@ int main() {
 	Simulator::RegSet();
 	return 0;
 }
+
 #endif

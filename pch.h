@@ -22,6 +22,11 @@
 #define UINT_32 unsigned int
 #define UINT_64 unsigned long long 
 // TODO: 添加要在此处预编译的标头
+#define SINT_8  char
+#define SINT_16 short
+#define SINT_32 int
+#define SINT_64 long long 
+
 enum {
 	BOOL = 1,
 	INT_16 = 2,
