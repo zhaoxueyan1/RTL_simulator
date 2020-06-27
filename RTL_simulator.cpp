@@ -35,11 +35,7 @@ namespace Simulator {
 		//Node::MP.clear();
 	}
 
-	//void RegTrans() {
-
-	//	
-	//	putchar(10);
-	//}
+# if 0
 	void RegSet() {
 		while (!TransQueue.empty())
 			TransQueue.pop();
@@ -84,6 +80,7 @@ namespace Simulator {
 		}
 		putchar(10);
 	}
+
 	void CombTrans() {
 		/*for (int i = 0; i < Node::CombSet->size(); i++) {
 				(*Node::CombSet)[i]->GetData();
@@ -119,15 +116,19 @@ namespace Simulator {
 		CombTrans();
 		//RegTrans();
 	}
+#endif
+# if 1
+
+# endif
 }
 
-# if 0
+# if 1
 int Data[] = { 0,1,2,3,4 };
 int main() {
 	Simulator::Init(4);
 	vector<P>input;
 	for (int i = 0; i < 5; i++) {
-		input.clear();
+		input.clear();	
 		int* a = new int;
 		*a = Data[i];
 		P t = make_pair(0, a);

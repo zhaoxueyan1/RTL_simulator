@@ -10,13 +10,13 @@ public:
 			return Data;
 		status += 1;
 		//void * data = malloc(dType);
-		*(Uint<32>*)this->Data = *(Uint<32>*)((*Node::AllSet)[0]->Data) + *(Uint<32>*)((*Node::AllSet)[0]->Data);
+		*(UInt<32>*)this->Data = *(UInt<32>*)((*Node::AllSet)[0]->Data) + *(UInt<32>*)((*Node::AllSet)[0]->Data);
 		return Data;
 	}
 
 	static Node * Create(int id, int dtype, int nxtNum, int pre_num) {
 		Node * ptr = new Add(id, dtype, nxtNum, pre_num);
-		ptr->Data = new Uint<32>();
+		ptr->Data = new UInt<32>();
 		return ptr;
 	}
 };
