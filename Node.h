@@ -1,5 +1,6 @@
 #pragma once
 #include"pch.h"
+#include"Type.h"
 
 using namespace std;
 
@@ -31,9 +32,16 @@ public:
 	static vector<Node*>* RegSet;
 	static Node * Gptr; // to storge the whole objects
 	
-	virtual void* GetData() = 0;
+	virtual void Update() = 0;
+	virtual void SetData(void * Data) {
+		if (this->Data)
+			free(this);
+		this->Data = Data;
+	}
+	virtual UINT_64 getUIntData() { return 0; }
+	virtual SINT_64 getSIntData() { return 0; }
 	// virtual void* Create() = 0;
-	virtual void setData(void * p);
+	//void setData(UINT_64 b);
 	void* getData() {
 		return Data;
 	}

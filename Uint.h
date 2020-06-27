@@ -6,6 +6,7 @@ template<int w>
 class UInt:public Type<w> 
 {
 public:
+	
 	UInt();
 	UInt(UINT_64 w);
 	~UInt();
@@ -13,9 +14,14 @@ public:
 	operator UINT_64()const;
 	//operator bool()const;
 	UInt<w>& operator=(const UInt<w>& b) {
-		return UInt<w>(b);
+		memcpy(this->data, b.data, this->t);
+		return *this;
 	}
-	//operator bool();
+
+	void setData(UINT_64 b) {
+		*this = b;
+	}
+	
 	friend inline const UInt<w> operator+(const UInt<w>& a, const UInt<w>& b) { return UInt<w>(UINT_64(a) + UINT_64(b)); }
 	friend inline const UInt<w> operator-(const UInt<w>& a, const UInt<w>& b) { return UInt<w>(UINT_64(a) - UINT_64(b)); }
 	friend inline const UInt<w> operator*(const UInt<w>& a, const UInt<w>& b) { return UInt<w>(UINT_64(a) * UINT_64(b)); }
@@ -49,8 +55,6 @@ public:
 		return UInt<up-lo+1>(res);
 	}
 	//UInt
-	
-
 	
 	template<int u> 
 	const UInt<w-u>& tail()const {

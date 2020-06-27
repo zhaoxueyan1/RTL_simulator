@@ -6,7 +6,7 @@
 #include "List.h"
 
 using namespace std;
-typedef pair<int, int>P;
+typedef pair<int, void* >P;
 
 namespace Simulator {
 
@@ -29,8 +29,33 @@ namespace Simulator {
 			}
 		}
 	}
-
 # if 1
+	void RegSet() {
+		for (int i = 0; i < SetS.size(); i++) {
+			auto& t = SetS[i];
+			(*Node::AllSet)[t.first]->SetData(t.second);
+		}
+
+	}
+	
+	void CombTrans() {
+		auto& T = (*Node::CombSet);
+		for (int i = 0; i < T.size();i++) {
+			T[i]->Update();
+			printf("%u\n",T[i]->getUIntData());
+		}
+	}
+
+	void RegTrans() {
+		auto& T = (*Node::AllSet);
+		for (int i = 0; i < T.size(); i++) {
+			T[i]->Update();
+			printf("%u\n", T[i]->getUIntData());
+		}
+	}
+# endif
+
+# if 0
 	void RegSet() {
 		while (!TransQueue.empty())
 			TransQueue.pop();
@@ -74,19 +99,19 @@ namespace Simulator {
 				continue;
 			vis[u] = true;
 			Node * t = (*Node::AllSet)[u];
-			t->GetData();
+			t->getUIntData();
 			for (int i = 0; i < t->nxtTbl->size(); i++) {
 				int tt = (*t->nxtTbl)[i];
 				if ( tt>= Node::RegSet->size()&&!vis[tt]) {
 					TransQueue.push(tt);
 				}
 				else {
-					SetS.push_back(make_pair((*t->nxtTbl)[i],UINT_64(t->GetData())	));
+					SetS.push_back(make_pair((*t->nxtTbl)[i],UINT_64(t->getUIntData())	));
 				}
 			}
 		}
 	}
-
+#endif
 	void MoveCycle(vector<P>& t) {
 		for (auto i : t) {
 			SetS.push_back(i);
@@ -95,12 +120,10 @@ namespace Simulator {
 		SetS.clear(); 
 		Comb::setFlag += 1;
 		CombTrans();
-		//RegTrans();
+		RegTrans();
 	}
-#endif
-# if 1
 
-# endif
+
 }
 
 # if 1
@@ -110,7 +133,7 @@ int main() {
 	vector<P>input;
 	for (int i = 0; i < 5; i++) {
 		input.clear();	
-		input.push_back(make_pair(0, Data[i]));
+		input.push_back(make_pair(0, new UInt<32>(Data[i])));
 		Simulator::MoveCycle(input);
 	}
 	Simulator::RegSet();

@@ -28,6 +28,7 @@
 #define SINT_16 short
 #define SINT_32 int
 #define SINT_64 long long 
+#define CALC(w) ((w) <= 8 ? 1 : (w) <= 16 ? 2 : (w) <= 32 ? 4 : (w) <= 64 ? 8 : 8)
 
 enum {
 	BOOL = 1,

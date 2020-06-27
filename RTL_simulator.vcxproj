@@ -89,12 +89,13 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies />
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -154,15 +155,19 @@
   <ItemGroup>
     <ClInclude Include="Add.h" />
     <ClInclude Include="Comb.h" />
-    <ClInclude Include="GenerateNode.h" />
     <ClInclude Include="GlobalVar.h" />
+    <ClInclude Include="List.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Reg.h" />
     <ClInclude Include="ReOrder.h" />
+    <ClInclude Include="Sint.h" />
+    <ClInclude Include="Type.h" />
+    <ClInclude Include="Uint.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Add.cpp" />
+    <ClCompile Include="CodeGenerator.cpp" />
     <ClCompile Include="Comb.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="pch.cpp">
@@ -171,9 +176,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Reg.cpp" />
     <ClCompile Include="RTL_simulator.cpp" />
     <ClCompile Include="TestBench.cpp" />
+    <ClCompile Include="UnitTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Input\1.in" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

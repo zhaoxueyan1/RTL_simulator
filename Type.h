@@ -8,11 +8,10 @@ class Type
 public:
 	Type();
 	~Type();
-	inline static int cal(int w) {
-		return w <= 8 ? 1 : w <= 16 ? 2 : w <= 32 ? 4 : w <= 64 ? 8 : 8;
-	}
 	int t;
+	//virtual operator=(UINT_64 b)=0;
 	void *data;
+	virtual void setData(UINT_64 b) = 0;
 };
 
 template<int w>
@@ -23,7 +22,7 @@ Type<w>::~Type()
 template<int w>
 Type<w>::Type()
 {
-	this->t = cal(w);
+	this->t = CALC(w);
 	this->data = malloc(t);
 	memset(this->data, 0, this->t);
 }
