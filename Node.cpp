@@ -26,8 +26,8 @@ void Node::SetArg(int dType, int preNum, int nxtNum) {
 
 }
 
-void Node::setData(void * p) {
-	memcpy(this->Data, p, this->dType);
+void Node::setData(UINT_64 b) {
+	((Type<32> *)this->Data)->setData(b);
 }
 
 vector<Node*>* Node::AllSet = nullptr;
