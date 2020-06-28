@@ -10,19 +10,18 @@ public:
 	~Type();
 	int t;
 	//virtual operator=(UINT_64 b)=0;
-	void *data;
+	UINT_64 data;
 	virtual void setData(UINT_64 b) = 0;
 };
 
 template<int w>
 Type<w>::~Type()
 {
-	free(this->data);
+	
 }
 template<int w>
 Type<w>::Type()
 {
 	this->t = CALC(w);
-	this->data = malloc(t);
-	memset(this->data, 0, this->t);
+	this->t = 0;
 }

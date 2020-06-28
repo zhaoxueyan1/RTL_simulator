@@ -18,19 +18,16 @@ namespace Simulator {
 		Node::RegSet = new vector<Node*>;
 
 		Generate::GenerateNode();
-		/*
-		for (auto i : (*Node::AllSet)) {
-			//cout << typeid(*i).name()<< endl;
-			if (typeid(*i) == typeid(Reg)) {
-				Node::RegSet->push_back(i);
-			}
-			else {
-				Node::CombSet->push_back(i);
-			}
-		}
-		*/
 	}
 # if 1
+	void Out() {
+		auto& T = (*Node::AllSet);
+		for (int i = 0; i < T.size(); i++) {
+			printf("%u\t", T[i]->getUIntData());
+		}
+		putchar(10);
+	}
+
 	void RegSet() {
 		for (int i = 0; i < SetS.size(); i++) {
 			auto& t = SetS[i];
@@ -41,10 +38,20 @@ namespace Simulator {
 	
 	void CombTrans() {
 		auto& T = (*Node::CombSet);
+#if DEBUG
+		printf("\nDebug ----\n");
+#endif
 		for (int i = 0; i < T.size();i++) {
 			T[i]->Update();
-			printf("%u\t",T[i]->getUIntData());
+#if DEBUG
+
+			printf("Comb %d=%u\n",i,T[i]->getUIntData());
+			Out();
+			//putchar(10);
+#endif // DEBUG
+
 		}
+		
 	}
 
 	void RegTrans() {
@@ -52,7 +59,6 @@ namespace Simulator {
 		for (int i = 0; i < T.size(); i++) {
 			Reg* t = dynamic_cast< Reg*>(T[i]);
 			t->Update();
-			printf("%u\t", t->getUIntData());
 		}
 	}
 # endif
@@ -121,25 +127,43 @@ namespace Simulator {
 		RegSet();
 		SetS.clear(); 
 		Comb::setFlag += 1;
+		Out();
 		CombTrans();
 		RegTrans();
+		//Out();
 		putchar(10);
 	}
-
-
 }
 
 # if 1
-int Data[] = { 0,1,2,3,4 };
+vector<pair<int,vector<pair<int,int>>>>Input;
 int main() {
 	Simulator::Init(4);
 	vector<P>input;
 
 	printf("io_a\tio_b\tio_e\tio_z\tio_v\tx\ty\t");
 	putchar(10);
-	for (int i = 0; i < 5; i++) {
-		input.clear();	
-		input.push_back(make_pair(0, new UInt<32>(Data[i])));
+	int j = 0;
+	vector<pair<int, int>>t1;
+	t1.push_back({0,36}); // 给io_a赋值
+	t1.push_back({1,6}); // 给io_b赋值
+	t1.push_back({2,1}); // 给io_e赋值
+	
+	vector<pair<int, int>>t2;
+	t2.push_back({0,36}); // 给io_a赋值
+	t2.push_back({1,6}); // 给io_b赋值
+	t2.push_back({2,0}); // 给io_e赋值
+
+	Input.push_back(make_pair(0,t1));
+	Input.push_back(make_pair(1,t2));
+	for (int i = 0; i < 10; i++) {
+		input.clear();
+		if (j < Input.size() && Input[j].first == i) {
+			for (auto& t : Input[j].second)
+			{
+				input.push_back(make_pair(t.first,new UInt<32>(t.second)));
+			}
+		}
 		Simulator::MoveCycle(input);
 	}
 	Simulator::RegSet();

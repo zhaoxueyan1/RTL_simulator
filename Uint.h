@@ -13,8 +13,8 @@ public:
 
 	operator UINT_64()const;
 	//operator bool()const;
-	UInt<w>& operator=(const UInt<w>& b) {
-		memcpy(this->data, b.data, this->t);
+	UInt<w>& operator=(const UInt<w>& b){
+		this->data = b.data;
 		return *this;
 	}
 
@@ -45,7 +45,7 @@ public:
 	bool operator==(const UINT_64 b)const {
 		return UINT_64(*this) - b == 0;
 	}
-	template<int lo,int up>
+	template<int up,int lo>
 	UInt<up - lo + 1> & bits() {
 		UINT_64 t = UINT_64(*this)>>lo;
 		UINT_64 res = 0;
@@ -63,20 +63,20 @@ public:
 	
 	template<int u>
 	UInt(const UInt<u>& b) {
-		memcpy(this->data,b.data,min(this->t,b.t));
+		this->data = b.data;
 	}
 };
 
 template<int w>
 inline UInt<w>::UInt()
 {
-
+	this->data = 0;
 }
 
 template<int w>
 inline UInt<w>::UInt(UINT_64 w)
 {
-	memcpy(this->data, &w, this->t);
+	this->data = w;
 }
 
 template<int w>
@@ -90,15 +90,7 @@ inline UInt<w>::~UInt()
 template<int w>
 UInt<w>::operator UINT_64() const
 {
-	switch (this->t)
-	{
-	case 1: return *((UINT_8*)this->data); 
-	case 2: return *((UINT_16*)this->data); 
-	case 4: return *((UINT_32*)this->data); 
-	case 8: return *((UINT_64*)this->data);
-	default:
-		break;
-	}
+	return this->data;
 }
 
 //template<int w>
