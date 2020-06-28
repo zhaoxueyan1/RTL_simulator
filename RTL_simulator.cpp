@@ -163,6 +163,7 @@ int main() {
 			{
 				input.push_back(make_pair(t.first,new UInt<32>(t.second)));
 			}
+			j++;
 		}
 		Simulator::MoveCycle(input);
 	}
