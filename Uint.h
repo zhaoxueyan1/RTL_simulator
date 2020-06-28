@@ -34,10 +34,10 @@ public:
 	friend inline const UInt<w> operator*(const UInt<w>& a, UINT_64 b) { return UINT_64(a) *= b; }
 	friend inline bool operator!=(const UInt<w>& a, const UInt<w>& b) { return memcmp(a.data, b.data, sizeof(a.t)) != 0; }
 	friend inline bool operator!=(const UInt<w>& a, UINT_64 b) { return !(a - b == 0); }
-	friend inline bool operator>(const UInt<w>& a, const UInt<w>& b)  { return UINT_64(a)-UINT_64(b) > 0; }
-	friend inline bool operator<(const UInt<w>& a, const UInt<w>& b)  { return UINT_64(a)-UINT_64(b) < 0; }
-	friend inline bool operator>=(const UInt<w>& a, const UInt<w>& b) { return UINT_64(a)-UINT_64(b) >= 0; }
-	friend inline bool operator<=(const UInt<w>& a, const UInt<w>& b) { return UINT_64(a)-UINT_64(b) <= 0; }
+	friend inline bool operator>(const UInt<w>& a, const UInt<w>& b)  { return UINT_64(a)>UINT_64(b); }
+	friend inline bool operator<(const UInt<w>& a, const UInt<w>& b)  { return UINT_64(a)<UINT_64(b); }
+	friend inline bool operator>=(const UInt<w>& a, const UInt<w>& b) { return UINT_64(a)>=UINT_64(b); }
+	friend inline bool operator<=(const UInt<w>& a, const UInt<w>& b) { return UINT_64(a)<=UINT_64(b); }
 	//template<int u> friend inline bool operator==(const UInt<w>& a, const UInt<u>& b) { return UINT_64(a) == UINT_64(b); }
 	//friend inline bool operator==(const UInt<w>& a, UINT_64 b) { return a-b == 0; }
 	//friend inline bool operator==(const UInt<w>& a, bool b) { return a-b == 0; }

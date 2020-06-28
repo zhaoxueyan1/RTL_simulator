@@ -145,13 +145,13 @@ int main() {
 	putchar(10);
 	int j = 0;
 	vector<pair<int, int>>t1;
-	t1.push_back({0,36}); // 给io_a赋值
-	t1.push_back({1,6}); // 给io_b赋值
+	t1.push_back({0,21}); // 给io_a赋值
+	t1.push_back({1,14}); // 给io_b赋值
 	t1.push_back({2,1}); // 给io_e赋值
 	
 	vector<pair<int, int>>t2;
-	t2.push_back({0,36}); // 给io_a赋值
-	t2.push_back({1,6}); // 给io_b赋值
+	t2.push_back({0,21}); // 给io_a赋值
+	t2.push_back({1,14}); // 给io_b赋值
 	t2.push_back({2,0}); // 给io_e赋值
 
 	Input.push_back(make_pair(0,t1));
