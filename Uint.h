@@ -22,13 +22,13 @@ public:
 		*this = b;
 	}
 	
-	friend inline const UInt<w> operator+(const UInt<w>& a, const UInt<w>& b) { return UInt<w>(UINT_64(a) + UINT_64(b)); }
-	friend inline const UInt<w> operator-(const UInt<w>& a, const UInt<w>& b) { return UInt<w>(UINT_64(a) - UINT_64(b)); }
-	friend inline const UInt<w> operator*(const UInt<w>& a, const UInt<w>& b) { return UInt<w>(UINT_64(a) * UINT_64(b)); }
-	friend inline const UInt<w> operator/(const UInt<w>& a, const UInt<w>& b) { return UInt<w>(UINT_64(a) / UINT_64(b)); }
-	friend inline const UInt<w> operator|(const UInt<w>& a, const UInt<w>& b) { return UInt<w>(UINT_64(a) | UINT_64(b)); }
-	friend inline const UInt<w> operator&(const UInt<w>& a, const UInt<w>& b) { return UInt<w>(UINT_64(a) & UINT_64(b)); }
-	friend inline const UInt<w> operator^(const UInt<w>& a, const UInt<w>& b) { return UInt<w>(UINT_64(a) ^ UINT_64(b)); }
+	friend inline const UInt<w> operator+(const UInt<w>& a, const UInt<w>& b) { return UINT_64(a) + UINT_64(b); }
+	friend inline const UInt<w> operator-(const UInt<w>& a, const UInt<w>& b) { return UINT_64(a) - UINT_64(b); }
+	friend inline const UInt<w> operator*(const UInt<w>& a, const UInt<w>& b) { return UINT_64(a) * UINT_64(b); }
+	friend inline const UInt<w> operator/(const UInt<w>& a, const UInt<w>& b) { return UINT_64(a) / UINT_64(b); }
+	friend inline const UInt<w> operator|(const UInt<w>& a, const UInt<w>& b) { return UINT_64(a) | UINT_64(b); }
+	friend inline const UInt<w> operator&(const UInt<w>& a, const UInt<w>& b) { return UINT_64(a) & UINT_64(b); }
+	friend inline const UInt<w> operator^(const UInt<w>& a, const UInt<w>& b) { return UINT_64(a) ^ UINT_64(b); }
 	friend inline const UInt<w> operator>>(const UInt<w>& a, int shift) { return UINT_64(a) >>= shift; }
 	friend inline const UInt<w> operator<<(const UInt<w>& a, int shift) { return UINT_64(a) <<= shift; }
 	friend inline const UInt<w> operator*(const UInt<w>& a, UINT_64 b) { return UINT_64(a) *= b; }
@@ -52,18 +52,17 @@ public:
 		for (int i = 0; i < up - lo + 1; i++) {
 			res |= t & 1 << i;
 		}
-		return UInt<up-lo+1>(res);
+		return *(new UInt<up-lo+1>(res));
 	}
 	//UInt
 	
 	template<int u> 
 	const UInt<w-u>& tail()const {
-		return UInt<w-u>(*this);
+		return *(new UInt<w-u>(*this));
 	}
 	
 	template<int u>
 	UInt(const UInt<u>& b) {
-		//this->t = cal();
 		memcpy(this->data,b.data,min(this->t,b.t));
 	}
 };

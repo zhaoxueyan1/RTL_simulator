@@ -18,16 +18,17 @@ namespace Simulator {
 		Node::RegSet = new vector<Node*>;
 
 		Generate::GenerateNode();
+		/*
 		for (auto i : (*Node::AllSet)) {
 			//cout << typeid(*i).name()<< endl;
-			if (typeid(*i) == typeid(Reg))
-			{
+			if (typeid(*i) == typeid(Reg)) {
 				Node::RegSet->push_back(i);
 			}
 			else {
 				Node::CombSet->push_back(i);
 			}
 		}
+		*/
 	}
 # if 1
 	void RegSet() {
@@ -42,15 +43,16 @@ namespace Simulator {
 		auto& T = (*Node::CombSet);
 		for (int i = 0; i < T.size();i++) {
 			T[i]->Update();
-			printf("%u\n",T[i]->getUIntData());
+			printf("%u\t",T[i]->getUIntData());
 		}
 	}
 
 	void RegTrans() {
-		auto& T = (*Node::AllSet);
+		auto& T = (*Node::RegSet);
 		for (int i = 0; i < T.size(); i++) {
-			T[i]->Update();
-			printf("%u\n", T[i]->getUIntData());
+			Reg* t = dynamic_cast< Reg*>(T[i]);
+			t->Update();
+			printf("%u\t", t->getUIntData());
 		}
 	}
 # endif
@@ -121,6 +123,7 @@ namespace Simulator {
 		Comb::setFlag += 1;
 		CombTrans();
 		RegTrans();
+		putchar(10);
 	}
 
 
@@ -131,6 +134,9 @@ int Data[] = { 0,1,2,3,4 };
 int main() {
 	Simulator::Init(4);
 	vector<P>input;
+
+	printf("io_a\tio_b\tio_e\tio_z\tio_v\tx\ty\t");
+	putchar(10);
 	for (int i = 0; i < 5; i++) {
 		input.clear();	
 		input.push_back(make_pair(0, new UInt<32>(Data[i])));

@@ -10,7 +10,7 @@ public:
 	~Reg() {
 	}
 	
-	void Update();
+	virtual void Update();
 };
 
 Reg::Reg(int id, int dtype, int nxtNum, int pre_num)

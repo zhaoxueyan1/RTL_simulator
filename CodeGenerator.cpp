@@ -20,6 +20,7 @@ namespace CodeGenerator {
 		
 		virtual void generate() = 0;
 		virtual void create() = 0;
+		virtual void push() = 0;
 		int id;
 	};
 	
@@ -59,6 +60,10 @@ namespace CodeGenerator {
 		void create() {
 			printf("\t\t(*Node::AllSet).push_back(%s::Create(%d,sizeof(%s),0,2));\n", name.c_str(), id, cppType.c_str());
 		}
+
+		void push() {
+			printf("\t\t(*Node::CombSet).push_back((*Node::AllSet).back());\n");
+		}
 	};
 
 	struct Reg :public Node {
@@ -80,6 +85,10 @@ namespace CodeGenerator {
 		void create() {
 			printf("\t\t(*Node::AllSet).push_back(Reg%s::Create(%d,sizeof(%s),0,2));\n", name.c_str() ,id, cppType.c_str());
 		}
+
+		void push() {
+			printf("\t\t(*Node::RegSet).push_back((*Node::AllSet).back());\n");
+		}
 	};
 
 	vector<pair<int, Node*>>G;
@@ -94,6 +103,7 @@ namespace CodeGenerator {
 		printf("namespace Generate {\n\tvoid GenerateNode() {\n");
 		for (int i = 0; i < G.size(); i++) {
 			(G[i].second)->create();
+			G[i].second->push();
 		}
 		printf("\t}\n}");
 	}

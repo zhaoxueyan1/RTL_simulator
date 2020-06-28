@@ -35,7 +35,7 @@ public:
 	virtual void Update() = 0;
 	virtual void SetData(void * Data) {
 		if (this->Data)
-			free(this);
+			free(this->Data);
 		this->Data = Data;
 	}
 	virtual UINT_64 getUIntData() { return 0; }

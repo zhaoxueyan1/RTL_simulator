@@ -142,15 +142,26 @@ public:
 namespace Generate {
 	void GenerateNode() {
 		(*Node::AllSet).push_back(Regio_a::Create(0,sizeof(UInt<32>),0,2));
+		(*Node::RegSet).push_back((*Node::AllSet).back());
 		(*Node::AllSet).push_back(Regio_b::Create(1,sizeof(UInt<32>),0,2));
+		(*Node::RegSet).push_back((*Node::AllSet).back());
 		(*Node::AllSet).push_back(Regio_e::Create(2,sizeof(UInt<1>),0,2));
+		(*Node::RegSet).push_back((*Node::AllSet).back());
 		(*Node::AllSet).push_back(Regio_z::Create(3,sizeof(UInt<32>),0,2));
+		(*Node::RegSet).push_back((*Node::AllSet).back());
 		(*Node::AllSet).push_back(Regio_v::Create(4,sizeof(UInt<1>),0,2));
+		(*Node::RegSet).push_back((*Node::AllSet).back());
 		(*Node::AllSet).push_back(Regx::Create(5,sizeof(UInt<32>),0,2));
+		(*Node::RegSet).push_back((*Node::AllSet).back());
 		(*Node::AllSet).push_back(Regy::Create(6,sizeof(UInt<32>),0,2));
+		(*Node::RegSet).push_back((*Node::AllSet).back());
 		(*Node::AllSet).push_back(Node7::Create(7,sizeof(UInt<32>),0,2));
+		(*Node::CombSet).push_back((*Node::AllSet).back());
 		(*Node::AllSet).push_back(Node8::Create(8,sizeof(UInt<1>),0,2));
+		(*Node::CombSet).push_back((*Node::AllSet).back());
 		(*Node::AllSet).push_back(Node9::Create(9,sizeof(UInt<32>),0,2));
+		(*Node::CombSet).push_back((*Node::AllSet).back());
 		(*Node::AllSet).push_back(Node10::Create(10,sizeof(UInt<32>),0,2));
+		(*Node::CombSet).push_back((*Node::AllSet).back());
 	}
 }
