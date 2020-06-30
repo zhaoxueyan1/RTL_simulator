@@ -171,8 +171,8 @@ class AnalyzeCircuit extends Transform {
                     case (str, (searchFor, replaceWith)) => str.replaceFirst(searchFor, replaceWith)
                 }
                 val printfArgs = Seq(s""""$formatString"""") ++
-                  (p.args map { arg => s"${emitExprWrap(arg)}.as_single_word()" })
-                Seq(s"if (UNLIKELY(done_reset && update_registers && verbose && ${emitExprWrap(p.en)})) printf(${printfArgs mkString (", ")});")
+                  (p.args map { arg => s"${emitExpr(arg)}.as_single_word()" })
+                Seq(s"if (UNLIKELY(done_reset && update_registers && verbose && ${emitExpr(p.en)})) printf(${printfArgs mkString (", ")});")
             case _ =>
         }
         s map walkStatement(graph)
@@ -224,7 +224,7 @@ class AnalyzeCircuit extends Transform {
                 val tuple = Main.genCppType(w.tpe)
                 val t = graph.addNode(s"WSubAccess${graph.cnt}",tuple._1,tuple._2,"None","WSubAccess",s"${emitExpr(w.index)}")
                 graph.EdgeSet:+=new Edge(t.name,emitExpr(w.expr))
-//                s"${emitExpr(w.expr)}[${emitExprWrap(w.index)}.as_single_word()]"
+//                s"${emitExpr(w.expr)}[${emitExpr(w.index)}.as_single_word()]"
                 t
 
             case p: DoPrim =>
@@ -241,6 +241,8 @@ class AnalyzeCircuit extends Transform {
                         val t = graph.addNode(s"Add${graph.cnt}","None",0,"None","Add","None");
                         val l = parseExpr(p.args(0))
                         val r = parseExpr(p.args(1))
+                        t.cppType = l.cppType
+                        t.cppWidth = l.cppWidth
                         graph.EdgeSet:+= new Edge(t.name,l.name)
                         graph.EdgeSet:+= new Edge(t.name,r.name)
                         graph.EdgeSet:+= new Edge(l.name,t.name)
@@ -256,6 +258,8 @@ class AnalyzeCircuit extends Transform {
                     case Subw => val t = graph.addNode(s"Add${graph.cnt}","None",0,"None","Add","None");
                         val l = parseExpr(p.args(0))
                         val r = parseExpr(p.args(1))
+                        t.cppType = l.cppType
+                        t.cppWidth = l.cppWidth
                         graph.EdgeSet:+= new Edge(t.name,l.name)
                         graph.EdgeSet:+= new Edge(t.name,r.name)
                         graph.EdgeSet:+= new Edge(l.name,t.name)
@@ -314,109 +318,145 @@ class AnalyzeCircuit extends Transform {
                         })
                         t
                     case Pad =>
-                        val node = graph.NodeMP(emitExprWrap(p.args.head))
+                        val node = graph.NodeMP(emitExpr(p.args.head))
                         val t = graph.addNode(s"Pad${graph.cnt}",node.cppType,bitWidth(p.tpe),"None","Pad","Pad");
                         graph.EdgeSet:+= new Edge(t.name,node.name)
                         t
-                        //s"${emitExprWrap(p.args.head)}.pad<${}>()"
-                    case AsUInt => val node = graph.NodeMP(emitExprWrap(p.args.head))
+                        //s"${emitExpr(p.args.head)}.pad<${}>()"
+                    case AsUInt => val node = graph.NodeMP(emitExpr(p.args.head))
                         val t = graph.addNode(s"AsUInt${graph.cnt}",s"UInt<${bitWidth(p.tpe)}>",bitWidth(p.tpe),"None","AsUInt","AsUInt");
                         graph.EdgeSet:+= new Edge(t.name,node.name)
                         t
-                    case AsSInt => val node = graph.NodeMP(emitExprWrap(p.args.head))
+                    case AsSInt => val node = graph.NodeMP(emitExpr(p.args.head))
                         val t = graph.addNode(s"AsSInt${graph.cnt}",s"SInt<${bitWidth(p.tpe)}>",bitWidth(p.tpe),"None","AsSInt","AsSInt");
                         graph.EdgeSet:+= new Edge(t.name,node.name)
                         t
                     case AsClock => throw new Exception("AsClock unimplemented!")
                     case Shl =>
-                        val node = graph.NodeMP(emitExprWrap(p.args.head))
+                        val node = graph.NodeMP(emitExpr(p.args.head))
                         val t = graph.addNode(s"Shl${graph.cnt}",node.cppType,bitWidth(p.tpe)+p.consts.head.toInt,"None","Shl",s"${p.consts.head.toInt}");
                         graph.EdgeSet:+= new Edge(t.name,node.name)
                         t
-                    //case Shlw => s"${emitExprWrap(p.args.head)}.shlw<${p.consts.head.toInt}>()"
+                    //case Shlw => s"${emitExpr(p.args.head)}.shlw<${p.consts.head.toInt}>()"
                     case Shr =>
-                        val node = graph.NodeMP(emitExprWrap(p.args.head))
+                        val node = graph.NodeMP(emitExpr(p.args.head))
                         val t = graph.addNode(s"Shr${graph.cnt}",node.cppType,bitWidth(p.tpe)-p.consts.head.toInt,"None","Shr",s"${p.consts.head.toInt}");
                         graph.EdgeSet:+= new Edge(t.name,node.name)
                         t
-                    case Dshl => val t = graph.addNode(s"Div${graph.cnt}","None",0,"None","Div","/");
+                    case Dshl =>
+                        val t1 = parseExpr(p.args(0))
+                        val t2 = parseExpr(p.args(1))
+                        val _2 = BigInt(2)
+                        val t = graph.addNode(s"Dshl${graph.cnt}",s"${t1.cppType}",t1.cppWidth+_2.pow(t2.cppWidth.toInt)-1,"None","Dshl","Dshl");
+                        graph.EdgeSet:+=new Edge(t.name,t1.name)
+                        graph.EdgeSet:+=new Edge(t.name,t2.name)
+                        t
+                    case Dshr => val t1 = parseExpr(p.args(0))
+                        val t2 = parseExpr(p.args(1))
+                        val _2 = BigInt(2)
+                        val t = graph.addNode(s"Dshr${graph.cnt}",s"${t1.cppType}",t1.cppWidth-_2.pow(t2.cppWidth.toInt)-1,"None","Dshr","Dshr");
+                        graph.EdgeSet:+=new Edge(t.name,t1.name)
+                        graph.EdgeSet:+=new Edge(t.name,t2.name)
+                        t
+                    case Dshlw => val t1 = parseExpr(p.args(0))
+                        val t2 = parseExpr(p.args(1))
+                        val _2 = BigInt(2)
+                        val t = graph.addNode(s"Dshr${graph.cnt}",s"${t1.cppType}",t1.cppWidth-_2.pow(t2.cppWidth.toInt)-1,"None","Dshr","Dshr");
+                        graph.EdgeSet:+=new Edge(t.name,t1.name)
+                        graph.EdgeSet:+=new Edge(t.name,t2.name)
+                        graph.EdgeSet:+=new Edge(t1.name,t.name)
+                        t
+                    case Cvt => val node = graph.NodeMP(emitExpr(p.args.head))
+                        val t = graph.addNode(s"Cvt${graph.cnt}",s"SInt",node.cppWidth,"None","Cvt","Cvt");
+                        graph.EdgeSet:+= new Edge(t.name,node.name)
+                        t
+                    case Neg => val node = graph.NodeMP(emitExpr(p.args.head))
+                        val t = graph.addNode(s"Neg${graph.cnt}",s"SInt",bitWidth(p.tpe),"None","Neg","-");
+                        graph.EdgeSet:+= new Edge(t.name,node.name)
+                        t
+                    case Not => val node = graph.NodeMP(emitExpr(p.args.head))
+                        val t = graph.addNode(s"Not${graph.cnt}",s"bool",1,"None","Not","!");
+                        graph.EdgeSet:+= new Edge(t.name,node.name)
+                        t
+                    case And => val t = graph.addNode(s"And${graph.cnt}","None",0,"None","And","&");
                         p.args map parseExpr foreach(e => {
                             graph.EdgeSet:+= new Edge(t.name,e.name)
                             t.cppWidth = e.cppWidth
                             t.cppType = e.cppType
                         })
                         t
-                    case Dshr => val t = graph.addNode(s"Div${graph.cnt}","None",0,"None","Div","/");
+                    case Or =>  val t = graph.addNode(s"Or${graph.cnt}","None",0,"None","Or","|");
                         p.args map parseExpr foreach(e => {
                             graph.EdgeSet:+= new Edge(t.name,e.name)
                             t.cppWidth = e.cppWidth
                             t.cppType = e.cppType
                         })
                         t
-                    case Dshlw => s"${emitExprWrap(p.args(0))}.dshlw(${emitExpr(p.args(1))})"
-                    case Cvt => s"${emitExprWrap(p.args.head)}.cvt()"
-                    case Neg => val node = graph.NodeMP(emitExprWrap(p.args.head))
-                        val t = graph.addNode(s"AsSInt${graph.cnt}",s"SInt<${bitWidth(p.tpe)}>",bitWidth(p.tpe),"None","AsSInt","AsSInt");
+                    case Xor => val t = graph.addNode(s"Xor${graph.cnt}","None",0,"None","Xor","^");
+                        val l = parseExpr(p.args(0))
+                        val r = parseExpr(p.args(1))
+                        t.cppType = l.cppType
+                        t.cppWidth = l.cppWidth
+                        graph.EdgeSet:+= new Edge(t.name,l.name)
+                        graph.EdgeSet:+= new Edge(t.name,r.name)
+                        t
+                    case Andr => val t = graph.addNode(s"Andr${graph.cnt}","bool",1,"None","Andr","&&");
+                        val l = parseExpr(p.args(0))
+                        val r = parseExpr(p.args(1))
+                        graph.EdgeSet:+= new Edge(t.name,l.name)
+                        graph.EdgeSet:+= new Edge(t.name,r.name)
+                        t
+                    case Orr =>  val t = graph.addNode(s"Orr${graph.cnt}","bool",1,"None","Xor","||");
+                        val l = parseExpr(p.args(0))
+                        val r = parseExpr(p.args(1))
+                        graph.EdgeSet:+= new Edge(t.name,l.name)
+                        graph.EdgeSet:+= new Edge(t.name,r.name)
+                        t
+                    case Xorr =>val t = graph.addNode(s"Xorr${graph.cnt}","bool",1,"None","Xorr","Xorr");
+                        val l = parseExpr(p.args(0))
+                        val r = parseExpr(p.args(1))
+                        graph.EdgeSet:+= new Edge(t.name,l.name)
+                        graph.EdgeSet:+= new Edge(t.name,r.name)
+                        t
+                    case Cat =>
+                        val l = parseExpr(p.args(0))
+                        val r = parseExpr(p.args(1))
+                        val t = graph.addNode(s"Cat${graph.cnt}",l.cppType,l.cppWidth+r.cppWidth,"None","Cat","Cat");
+                        graph.EdgeSet:+= new Edge(t.name,l.name)
+                        graph.EdgeSet:+= new Edge(t.name,r.name)
+                        t
+                    case Bits =>
+                        val node = graph.NodeMP(emitExpr(p.args.head))
+                        val t = graph.addNode(s"Bits${graph.cnt}",s"${node.cppType}",${p.consts(0).toInt-p.consts(1).toInt},s"${p.consts(0).toInt}","Bits",s"${p.consts(1).toInt}");
                         graph.EdgeSet:+= new Edge(t.name,node.name)
                         t
-                    case Not => val node = graph.NodeMP(emitExprWrap(p.args.head))
-                        val t = graph.addNode(s"AsSInt${graph.cnt}",s"SInt<${bitWidth(p.tpe)}>",bitWidth(p.tpe),"None","AsSInt","AsSInt");
+                    case Head =>
+                        val node = graph.NodeMP(emitExpr(p.args.head))
+                        val t = graph.addNode(s"Head${graph.cnt}",s"${node.cppType}",p.consts.head.toInt,"None","Head",s"${p.consts.head.toInt}");
                         graph.EdgeSet:+= new Edge(t.name,node.name)
                         t
-                    case And => val t = graph.addNode(s"Div${graph.cnt}","None",0,"None","Div","/");
-                        p.args map parseExpr foreach(e => {
-                            graph.EdgeSet:+= new Edge(t.name,e.name)
-                            t.cppWidth = e.cppWidth
-                            t.cppType = e.cppType
-                        })
-                        t
-                    case Or =>  val t = graph.addNode(s"Div${graph.cnt}","None",0,"None","Div","/");
-                        p.args map parseExpr foreach(e => {
-                            graph.EdgeSet:+= new Edge(t.name,e.name)
-                            t.cppWidth = e.cppWidth
-                            t.cppType = e.cppType
-                        })
-                        t
-                    case Xor => val t = graph.addNode(s"Div${graph.cnt}","None",0,"None","Div","/");
-                        p.args map parseExpr foreach(e => {
-                            graph.EdgeSet:+= new Edge(t.name,e.name)
-                            t.cppWidth = e.cppWidth
-                            t.cppType = e.cppType
-                        })
-                        t
-                    case Andr => val node = graph.NodeMP(emitExprWrap(p.args.head))
-                        val t = graph.addNode(s"AsSInt${graph.cnt}",s"SInt<${bitWidth(p.tpe)}>",bitWidth(p.tpe),"None","AsSInt","AsSInt");
+                    case Tail =>
+                        val node = graph.NodeMP(emitExpr(p.args.head))
+                        val t = graph.addNode(s"Tail${graph.cnt}",s"${node.cppType}",node.cppWidth-p.consts.head.toInt,"None","Tail",s"${p.consts.head.toInt}");
                         graph.EdgeSet:+= new Edge(t.name,node.name)
                         t
-                    case Orr =>  val node = graph.NodeMP(emitExprWrap(p.args.head))
-                        val t = graph.addNode(s"AsSInt${graph.cnt}",s"SInt<${bitWidth(p.tpe)}>",bitWidth(p.tpe),"None","AsSInt","AsSInt");
-                        graph.EdgeSet:+= new Edge(t.name,node.name)
-                        t
-                    case Xorr => val node = graph.NodeMP(emitExprWrap(p.args.head))
-                        val t = graph.addNode(s"AsSInt${graph.cnt}",s"SInt<${bitWidth(p.tpe)}>",bitWidth(p.tpe),"None","AsSInt","AsSInt");
-                        graph.EdgeSet:+= new Edge(t.name,node.name)
-                        t
-                    case Cat => s"${emitExprWrap(p.args(0))}.cat(${emitExpr(p.args(1))})"
-                    case Bits => s"${emitExprWrap(p.args.head)}.bits<${p.consts(0).toInt},${p.consts(1).toInt}>()"
-                    case Head => s"${emitExprWrap(p.args.head)}.head<${p.consts.head.toInt}>()"
-                    case Tail => s"${emitExprWrap(p.args.head)}.tail<${p.consts.head.toInt}>()"
                 }
             case _ => throw new Exception(s"Don't yet support $e")
 
         }
     }
 
-    def emitExprWrap(e: Expression): String = e match {
-        case DoPrim(_, _, _, _) | Mux(_, _, _, _) => s"(${emitExpr(e)})"
-        case _ => emitExpr(e)
-    }
+//    def emitExpr(e: Expression): String = e match {
+//        case DoPrim(_, _, _, _) | Mux(_, _, _, _) => s"(${emitExpr(e)})"
+//        case _ => emitExpr(e)
+//    }
 
     def emitExpr(e: Expression): String = {
         e match {
             case WRef(name, tpe, _, _) =>
                 name
             case u: UIntLiteral => {
-                val maxIn64Bits = (BigInt(1) << 64) - 1B
+                val maxIn64Bits = (BigInt(1) << 64) - 1
 
                 val width = bitWidth(u.tpe)
                 val asHexStr = u.value.toString(16)
@@ -429,7 +469,7 @@ class AnalyzeCircuit extends Transform {
                 else s"SInt<$width>(${splatLargeLiteralIntoRawArray(u.value, width)})"
             }
             case w: WSubField => s"${emitExpr(w.expr)}_${w.name}"
-            case w: WSubAccess => s"${emitExpr(w.expr)}[${emitExprWrap(w.index)}]"
+            case w: WSubAccess => s"${emitExpr(w.expr)}[${w.index}]"
             case _ => throw new Exception(s"Don't yet support $e")
 
         }
