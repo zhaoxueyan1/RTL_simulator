@@ -24,7 +24,7 @@ object Main{
     }
 
     def main(array: Array[String]) = {
-        generate(new File("./firrtl/Top2.fir"))
+        generate(new File("./NOOPSimTop.fir"))
     }
 
     def generate(inputFile: File) {
@@ -32,8 +32,6 @@ object Main{
             firrtl.Parser.IgnoreInfo)
         val  topName = circuit.main
         var state = CircuitState(circuit,firrtl.HighForm)
-
-        val analyzeCircuit = new AnalyzeCircuit()
 
         val ChirrtlToWorkingIR = new TransformManager(Forms.MinimalHighForm, Forms.ChirrtlForm)
         val irToWorkingIR = new TransformManager(Forms.WorkingIR, Forms.MinimalHighForm)
@@ -44,6 +42,7 @@ object Main{
             currentState=firrtl.stage.Forms.MinimalHighForm
         )
         state = compiler.transform(state)
+        val analyzeCircuit = new AnalyzeCircuit(state.circuit)
         analyzeCircuit.execute(state)
     }
 }

@@ -1,5 +1,7 @@
 package DiGraph
 
+import java.io.{File, PrintWriter}
+
 import firrtl.ir.DefModule
 
 import scala.collection.mutable
@@ -16,11 +18,14 @@ class Graph {
     var moduleMap = mutable.Map[String,DefModule]()
 
     def Output()={
+        val writer = new PrintWriter(new File("./Output.txt" ))
+        writer.println(NodeMP.size)
         NodeMP.foreach((e)=>{
             val t = e._2
-            printf("%s %s %s %s %s %s\n",t.id,t.tpe,t.cppType,t.dir,t.name,t.expr)
+            writer.write(s"${t.id} ${t.name} ${t.tpe} ${t.cppType} ${t.cppWidth} ${t.dir}  ${t.expr}\n")
         })
-        EdgeSet.foreach(e=>println(MP(e.from)+" "+MP(e.to)))
+        writer.println(EdgeSet.size)
+        EdgeSet.foreach(e=>writer.write(MP(e.from)+" "+MP(e.to)+"\n"))
     }
 
     def addNode(name:String, cppType:String,cppWidth:BigInt, dir:String,tpe:String, expr:String):Node={
