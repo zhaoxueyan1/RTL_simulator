@@ -207,7 +207,7 @@ class AnalyzeCircuit(val circuit: Circuit) extends Transform {
                 val condNode = parseExpr(prefix)(suffix)(m.cond)
                 val tvalNode = parseExpr(prefix)(suffix)(m.tval)
                 val fvalNode = parseExpr(prefix)(suffix)(m.fval)
-                val t = graph.addNode(s"Mux${graph.cnt}","Mux",0,"None","Mux",s"${condNode.name} ? ${tvalNode.name} : ${fvalNode.name}")
+                val t = graph.addNode(s"Mux${graph.cnt}","Mux",tvalNode.cppWidth,"None","Mux",s"${condNode.name} ? ${tvalNode.name} : ${fvalNode.name}")
                 graph.EdgeSet:+=new Edge(t.name , condNode.name)
                 graph.EdgeSet:+=new Edge(t.name , tvalNode.name)
                 graph.EdgeSet:+=new Edge(t.name , fvalNode.name)
@@ -217,7 +217,7 @@ class AnalyzeCircuit(val circuit: Circuit) extends Transform {
                 //println(m)
                 val condNode = parseExpr(prefix)(suffix)(vif.cond)
                 val tvalNode = parseExpr(prefix)(suffix)(vif.value)
-                val t = graph.addNode(s"ValidIf${graph.cnt}","ValidIf",0,"None","ValidIf",s"${condNode.name} ? ${tvalNode.name}")
+                val t = graph.addNode(s"ValidIf${graph.cnt}","ValidIf",tvalNode.cppWidth,"None","ValidIf",s"${condNode.name} ? ${tvalNode.name}")
                 graph.EdgeSet:+=new Edge(t.name , condNode.name)
                 graph.EdgeSet:+=new Edge(t.name , tvalNode.name)
                 t
@@ -357,15 +357,14 @@ class AnalyzeCircuit(val circuit: Circuit) extends Transform {
                         t
                     case Dshr => val t1 = parseExpr(prefix)(suffix)(p.args(0))
                         val t2 = parseExpr(prefix)(suffix)(p.args(1))
-                        val _2 = BigInt(2)
-                        val t = graph.addNode(s"Dshr${graph.cnt}",s"${t1.cppType}",t1.cppWidth-_2.pow(t2.cppWidth.toInt)-1,"None","Dshr","Dshr");
+                        val t = graph.addNode(s"Dshr${graph.cnt}",s"${t1.cppType}",t1.cppWidth,"None","Dshr","Dshr");
                         graph.EdgeSet:+=new Edge(t.name,t1.name)
                         graph.EdgeSet:+=new Edge(t.name,t2.name)
                         t
                     case Dshlw => val t1 = parseExpr(prefix)(suffix)(p.args(0))
                         val t2 = parseExpr(prefix)(suffix)(p.args(1))
                         val _2 = BigInt(2)
-                        val t = graph.addNode(s"Dshr${graph.cnt}",s"${t1.cppType}",t1.cppWidth-_2.pow(t2.cppWidth.toInt)-1,"None","Dshr","Dshr");
+                        val t = graph.addNode(s"Dshlw${graph.cnt}",s"${t1.cppType}",t1.cppWidth+_2.pow(t2.cppWidth.toInt)-1,"None","Dshlw","Dshlw");
                         graph.EdgeSet:+=new Edge(t.name,t1.name)
                         graph.EdgeSet:+=new Edge(t.name,t2.name)
                         graph.EdgeSet:+=new Edge(t1.name,t.name)
