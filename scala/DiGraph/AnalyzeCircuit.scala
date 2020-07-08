@@ -242,7 +242,7 @@ class AnalyzeCircuit(val circuit: Circuit) extends Transform {
                         })
                         t
                     case Addw =>
-                        val t = graph.addNode(s"Add${graph.cnt}","None",0,"None","Add","None");
+                        val t = graph.addNode(s"Add${graph.cnt}","None",0,"None","Addw","None");
                         val l = parseExpr(prefix)(suffix)(p.args(0))
                         val r = parseExpr(prefix)(suffix)(p.args(1))
                         t.cppType = l.cppType
@@ -259,7 +259,7 @@ class AnalyzeCircuit(val circuit: Circuit) extends Transform {
                             t.cppType = e.cppType
                         })
                         t
-                    case Subw => val t = graph.addNode(s"Add${graph.cnt}","None",0,"None","Add","None");
+                    case Subw => val t = graph.addNode(s"Add${graph.cnt}","None",0,"None","Subw","None");
                         val l = parseExpr(prefix)(suffix)(p.args(0))
                         val r = parseExpr(prefix)(suffix)(p.args(1))
                         t.cppType = l.cppType
@@ -409,7 +409,7 @@ class AnalyzeCircuit(val circuit: Circuit) extends Transform {
                         graph.EdgeSet:+= new Edge(t.name,l.name)
                         graph.EdgeSet:+= new Edge(t.name,r.name)
                         t
-                    case Orr =>  val t = graph.addNode(s"Orr${graph.cnt}","bool",1,"None","Xor","||");
+                    case Orr =>  val t = graph.addNode(s"Orr${graph.cnt}","bool",1,"None","Orr","||");
                         val l = parseExpr(prefix)(suffix)(p.args(0))
                         val r = parseExpr(prefix)(suffix)(p.args(1))
                         graph.EdgeSet:+= new Edge(t.name,l.name)
