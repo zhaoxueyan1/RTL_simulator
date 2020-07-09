@@ -24,7 +24,7 @@ object Main{
     }
 
     def main(array: Array[String]) = {
-        generate(new File("./NOOPSimTop.fir"))
+        generate(new File("./Top.fir"))
     }
 
     def generate(inputFile: File) {

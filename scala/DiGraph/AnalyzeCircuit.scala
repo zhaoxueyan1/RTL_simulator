@@ -2,7 +2,7 @@ package DiGraph
 import java.io.{File, FileWriter}
 
 import firrtl.ir._
-import firrtl.{Addw, ChirrtlToHighFirrtl, CircuitState, Dshlw, HighFirrtlToMiddleFirrtl, IRToWorkingIR, LowFirrtlOptimization, LowForm, MiddleFirrtlToLowFirrtl, ResolveAndCheck, Subw, Transform, Utils, WDefInstance, WRef, WSubAccess, WSubField, bitWidth}
+import firrtl.{Addw, ChirrtlToHighFirrtl, CircuitState, Dshlw, HighFirrtlToMiddleFirrtl, IRToWorkingIR, InstanceKind, LowFirrtlOptimization, LowForm, MiddleFirrtlToLowFirrtl, ResolveAndCheck, Subw, Transform, Utils, WDefInstance, WRef, WSubAccess, WSubField, bitWidth}
 
 import scala.io.Source
 import firrtl.Mappers._
@@ -44,7 +44,7 @@ class AnalyzeCircuit(val circuit: Circuit) extends Transform {
     def execute(circuitState: CircuitState): CircuitState = {
         circuit.modules.foreach(e=>{
             if(circuit.main == e.name) {
-                graph.InstanceNode+=(graph.instanceCnt->(e.name,e.name))
+                graph.InstanceNode:+=(e.name,e.name)
                 graph.instanceCnt+= 1
                 walkModule(graph.instanceCnt-1)("")(e)
             } else
@@ -146,9 +146,11 @@ class AnalyzeCircuit(val circuit: Circuit) extends Transform {
 
             case instance: WDefInstance =>
                 //                println(instance.module)
-                graph.InstanceNode+=(graph.instanceCnt->(instance.name,instance.module))
+                graph.InstanceLinkMP+=((instanceID,instance.name)->graph.instanceCnt)
+                graph.InstanceNode:+=(instance.name,instance.module)
                 graph.InstanceGraph+=(graph.instanceCnt->instanceID)
                 graph.instanceCnt+=1
+//                println(graph.InstanceID,instance.name)
                 walkModule(graph.instanceCnt-1)(suffix)(graph.moduleMap(instance.module))
 
             case connect: Connect => //等式左边
@@ -189,8 +191,11 @@ class AnalyzeCircuit(val circuit: Circuit) extends Transform {
 
     def parseExpr(instanceID: Int)(suffix: String)(e: Expression): Node = {
         e match {
-            case WRef(name, tpe, _, _) =>
-                graph.NodeMP((instanceID,name))
+            case WRef(name, tpe, kind, _) =>
+                if(kind==InstanceKind)
+                    graph.NodeMP((graph.InstanceLinkMP((instanceID,name)),suffix))
+                else
+                    graph.NodeMP((instanceID,name+suffix))
             case u: UIntLiteral => {
                 val maxIn64Bits = (BigInt(1) << 64) - 1
                 val width = bitWidth(u.tpe)
@@ -228,12 +233,13 @@ class AnalyzeCircuit(val circuit: Circuit) extends Transform {
                 t
             }
             case w: WSubField =>
+//                println(w)
                 parseExpr(instanceID)(w.name+suffix)(w.expr)
             case w: WSubAccess =>
                 val tuple = Main.genCppType(w.tpe)
                 val t = graph.addNode(instanceID,s"WSubAccess${graph.cnt}",tuple._1,tuple._2,"None","WSubAccess",s"${emitExpr(w.index)}")
-                emitExpr(w.expr)
-                graph.EdgeSet:+=new Edge((t.instanceID,t.name),)
+                val t2= parseExpr(instanceID)(suffix)(w.expr)
+                graph.EdgeSet:+=new Edge((t.instanceID,t.name),(t2.instanceID,t2.name))
                 //                s"${emitExpr(w.expr)}[${emitExpr(w.index)}.as_single_word()]"
                 t
 
