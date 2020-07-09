@@ -11,7 +11,9 @@ import scala.math.BigInt;
  * typ: Reg wire Mux Validif Node
  * ext: dynamic  i.e. Uint : 10
  * */
-class Node(var name:String,
+class Node(
+            var instanceID:Int,
+            var name:String,
            var id:String,
            var cppType:String,
            var cppWidth:BigInt,
@@ -23,6 +25,6 @@ class Node(var name:String,
 * from :
 * to  :
 * */
-class Edge(var from:String,
-           var to:String,
+class Edge(var from:(Int,String),
+           var to:(Int,String),
           )

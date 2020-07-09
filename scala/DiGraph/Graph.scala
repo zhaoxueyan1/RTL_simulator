@@ -8,13 +8,18 @@ import scala.collection.mutable
 
 class Graph {
     // name -> Node
-    var NodeMP = mutable.Map[String, Node]()
+    var NodeMP = mutable.Map[(Int,String), Node]()
     // edge collection
     var EdgeSet = mutable.Seq[Edge]()
-    // the name->id
-    var MP = mutable.Map[String,Int]()
+    // the instanceId,name->id
+    var MP = mutable.Map[(Int,String),Int]() //
+    // the Instance id -> (Instance name ,module name)
+    var InstanceNode = mutable.Map[Int,(String,String)]()
+    // id -> fa's id
+    var InstanceGraph = mutable.Map[Int,Int]()
     // the number of Node
     var cnt = 0
+    var instanceCnt = 0
     var moduleMap = mutable.Map[String,DefModule]()
 
     def Output()={
@@ -28,10 +33,10 @@ class Graph {
         EdgeSet.foreach(e=>writer.write(MP(e.from)+" "+MP(e.to)+"\n"))
     }
 
-    def addNode(name:String, cppType:String,cppWidth:BigInt, dir:String,tpe:String, expr:String):Node={
-        MP += (name -> cnt)
-        val node = new Node(name, s"${cnt}", cppType, cppWidth, dir, tpe, expr)
-        NodeMP += (name -> node)
+    def addNode(InstanceID:Int, name:String, cppType:String,cppWidth:BigInt, dir:String,tpe:String, expr:String):Node={
+        MP += ((InstanceID,name) -> cnt)
+        val node = new Node(InstanceID, name, s"${cnt}", cppType, cppWidth, dir, tpe, expr)
+        NodeMP += ((InstanceID,name) -> node)
         cnt += 1
         node
     }
