@@ -21,7 +21,7 @@ Tips:
 - More details will be introduced in other document, if you have a issues, plz let me know.
 
 ## Type
-
+```
 Node	:42890
 Mux		:16853
 UIntLiteral		:15964
@@ -56,9 +56,10 @@ Shr		:4
 AsSInt	:4
 Mul		:2
 Leq		:1
-
+```
 ## Width
 
+```
 83
 0	10702
 1	56098
@@ -143,9 +144,9 @@ Leq		:1
 274	2
 408	32
 2599	2
-
+```
 ## vcd files
-
+```
 1597322 <- Mcycle
 783385 <- Minstret
     0 <- MultiCommit
@@ -195,3 +196,4 @@ total guest instructions = 783385
 instrCnt = 783385, cycleCnt = 1597322, IPC = 0.490436
 Guest cycle spent: 1597323
 Host time spent: 105087ms
+```
