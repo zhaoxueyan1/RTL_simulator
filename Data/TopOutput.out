@@ -1,0 +1,89 @@
+4
+0 TestModule TestModule
+1 t Top
+2 t1 Passthroughs
+3 t1 AND
+3
+2 1
+1 0
+3 2
+41
+25 2 Bits25 Bits UInt 1 0  (0,0)
+35 0 And35 And UInt 1 None  &
+30 0 mem_T_1en Memen UInt 1 Default  0
+5 0 io_io_c Port UInt 1 Output  Node
+40 0 Uint40 UIntLiteral UInt 1 None  UInt<1>(0x1)
+10 1 io_out Port UInt 1 Output  Node
+6 1 clock Port ClockType 1 Input  Node
+21 3 And21 And UInt 1 None  &
+16 3 clock Port ClockType 1 Input  Node
+12 2 reset Port UInt 1 Input  Node
+27 1 And27 And UInt 1 None  &
+15 2 io_out Port UInt 4 Output  Node
+33 0 mem_T_1mask Memmask UInt 1 Default  0
+8 1 io_in_a Port UInt 1 Input  Node
+1 0 reset Port UInt 1 Input  Node
+32 0 mem_T_1data Memdata UInt 1 Default  0
+31 0 mem_T_1clk Memclk ClockType 1 Default  0
+11 2 clock Port ClockType 1 Input  Node
+19 3 io_io_b Port UInt 1 Input  Node
+24 2 _T Node UInt 4 None  None
+34 0 regClock1 Reg UInt 1 None  None
+13 2 io_in_a Port UInt 4 Input  Node
+26 2 Bits26 Bits UInt 1 0  (0,0)
+20 3 io_io_c Port UInt 1 Output  Node
+9 1 io_in_b Port UInt 1 Input  Node
+38 0 Uint38 UIntLiteral UInt 1 None  UInt<1>(0x1)
+37 0 regClock2 Reg UInt 1 None  None
+4 0 io_io_b Port UInt 1 Input  Node
+0 0 clock Port ClockType 1 Input  Node
+36 0 _T Node UInt 1 None  None
+7 1 reset Port UInt 1 Input  Node
+14 2 io_in_b Port UInt 4 Input  Node
+28 1 _T Node UInt 1 None  None
+22 3 _T Node UInt 1 None  None
+3 0 io_io_a Port UInt 1 Input  Node
+39 0 Uint39 UIntLiteral UInt 1 None  UInt<1>(0x1)
+2 0 io_stuff Port UInt 1 Input  Node
+17 3 reset Port UInt 1 Input  Node
+23 2 And23 And UInt 4 None  &
+29 0 mem_T_1addr Memaddr UInt 7 Default  0
+18 3 io_io_a Port UInt 1 Input  Node
+37
+21 18
+21 19
+22 21
+20 22
+23 13
+23 14
+24 23
+15 24
+16 11
+17 12
+25 13
+18 25
+26 14
+19 26
+27 8
+27 9
+28 27
+10 28
+11 6
+12 7
+13 8
+14 9
+35 3
+35 4
+36 35
+5 36
+34 2
+6 0
+7 1
+8 3
+9 4
+37 2
+29 38
+30 39
+31 0
+32 34
+33 40

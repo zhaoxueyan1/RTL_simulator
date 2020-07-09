@@ -1,6 +1,18 @@
-## Data Description
+## 1. Data Description
 
-The first line is a number **N**, which represents the number of vertices. And N lines are followed. For the each line, **7** items are expected. They represents ```Id```,```Name```,```Type```,```CppType```,```Width```,```Dir``` and ```Ext``` respectively. The following line has **Only one** number of **M**, which representes the number of **edge**. **M** lines are followed, each line has **2** numbers : **u** and **v**. They representes the **sink** and **source** respectively.
+This chapter has two section, the first section describes the ```Instance graph``` which includes two parts, and the second section represents the ```Signal graph``` which also includes two parts.  
+
+### 1.1 Instance graph
+
+The first line is a number **N**, which represents the number of ```Instance```. And N lines are followed. For the each line, 
+**3** items are expected. They represtens ```Instance ID```,```Instance Name``` and ```Moudule Name``` respectively.
+
+The following line has **Only one** number of **M**, which representes the number of **edge**. **M** lines are followed, each line has **2** numbers : **u** and **v**. They representes the **Instance ID** and it's Father's respectively.
+
+### 1.2 Signal graph
+
+The first line is a number **N**, which represents the number of vertices. And N lines are followed. For the each line, **8** items are expected. They represents ```Id```,```Instance ID```,```Name```,```Type```,```CppType```,```Width```,```Dir``` and ```Ext``` respectively. 
+The following line has **Only one** number of **M**, which representes the number of **edge**. **M** lines are followed, each line has **2** numbers : **u** and **v**. They representes the **sink** and **source** respectively.
 
 Tips: 
 
@@ -131,3 +143,55 @@ Leq		:1
 274	2
 408	32
 2599	2
+
+## vcd files
+
+1597322 <- Mcycle
+783385 <- Minstret
+    0 <- MultiCommit
+83239 <- MimemStall
+422261 <- MaluInstr
+186742 <- MbruInstr
+171382 <- MlsuInstr
+3001 <- MmduInstr
+    0 <- McsrInstr
+121535 <- MloadInstr
+    0 <- MmmioInstr
+    0 <- MicacheHit
+    0 <- MdcacheHit
+2277 <- MmulInstr
+36932 <- MifuFlush
+119234 <- MbpBRight
+9532 <- MbpBWrong
+18871 <- MbpJRight
+2538 <- MbpJWrong
+8780 <- MbpIRight
+23470 <- MbpIWrong
+2925 <- MbpRRight
+1392 <- MbpRWrong
+    0 <- Ml2cacheHit
+    0 <- Custom1
+2984 <- Custom2
+    0 <- Custom3
+    0 <- Custom4
+    0 <- Custom5
+6548 <- Custom6
+    0 <- Custom7
+    0 <- Custom8
+2055  <- MrawStall
+514846 <- MexuBusy
+250195 <- MloadStall
+146832 <- MstoreStall
+853497 <- ISUIssue
+853497 <- ISU1Issue
+    0  <- ISU2Issue
+375694 <- Src2NotReady
+192054 <- Dst2Conflict
+477803 <- Inst2NotALU
+160655 <- Inst2NoReady
+
+HIT GOOD TRAP at pc = 0x80004638
+total guest instructions = 783385
+instrCnt = 783385, cycleCnt = 1597322, IPC = 0.490436
+Guest cycle spent: 1597323
+Host time spent: 105087ms
