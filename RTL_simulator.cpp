@@ -6,9 +6,8 @@
 #include "List.h"
 
 using namespace std;
-typedef pair<int, void* >P;
-
-namespace Simulator {
+struct Simulator {
+	typedef pair<int, void* >P;
 
 	vector<P>SetS;
 	queue<int>TransQueue;
@@ -17,7 +16,7 @@ namespace Simulator {
 		Node::CombSet = new vector<Node*>;
 		Node::RegSet = new vector<Node*>;
 
-		Generate::GenerateNode();
+		//Generate::GenerateNode();
 	}
 # if 1
 	void Out() {
@@ -133,9 +132,9 @@ namespace Simulator {
 		//Out();
 		putchar(10);
 	}
-}
+};
 
-# if 1
+# if 0
 vector<pair<int,vector<pair<int,int>>>>Input;
 int main() {
 	Simulator::Init(4);
@@ -146,12 +145,12 @@ int main() {
 	int j = 0;
 	vector<pair<int, int>>t1;
 	t1.push_back({0,21}); // 给io_a赋值
-	t1.push_back({1,14}); // 给io_b赋值
+	t1.push_back({1,9}); // 给io_b赋值
 	t1.push_back({2,1}); // 给io_e赋值
 	
 	vector<pair<int, int>>t2;
 	t2.push_back({0,21}); // 给io_a赋值
-	t2.push_back({1,14}); // 给io_b赋值
+	t2.push_back({1,9}); // 给io_b赋值
 	t2.push_back({2,0}); // 给io_e赋值
 
 	Input.push_back(make_pair(0,t1));
@@ -161,7 +160,7 @@ int main() {
 		if (j < Input.size() && Input[j].first == i) {
 			for (auto& t : Input[j].second)
 			{
-				input.push_back(make_pair(t.first,new UInt<32>(t.second)));
+				input.push_back(make_pair(t.first,new UInt(t.second)));
 			}
 			j++;
 		}

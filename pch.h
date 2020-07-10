@@ -18,6 +18,8 @@
 #include<unordered_map>
 #include<queue>
 #include<set>
+#include<fstream>
+#include<string.h>
 
 #define UINT_8 unsigned char
 #define UINT_16 unsigned short

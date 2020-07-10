@@ -1,7 +1,6 @@
 #pragma once
 #include"pch.h"
 #include"Node.h"
-#include"Uint.h"
 
 class Reg :public Node
 {
@@ -23,19 +22,19 @@ void Reg::Update()
 	memcpy(this->Data, (*Node::AllSet)[(*this->preTbl)[0]]->Data, dType);
 }
 
-class Reg1 :public Reg
-{
-public:
-	Reg1(int id, int dtype, int nxtNum, int pre_num = 1) 
-		:Reg(id,dtype, nxtNum,pre_num){}
-	UINT_64 getUIntData() { return (UINT_64)*(UInt<32> *)this->Data; }
-	//SINT_64 getSIntData() { return (UINT_64)*(UInt<32> *)this->Data; }
-	static Node * Create(int id, int dtype, int nxtNum, int pre_num) { Node * ptr = new Reg1(id, dtype, nxtNum, 1);
-		ptr->Data = new UInt<32>(0);
-		(*ptr->preTbl).push_back(1);
-		return ptr;
-	}
-};
+//class Reg1 :public Reg
+//{
+//public:
+//	Reg1(int id, int dtype, int nxtNum, int pre_num = 1) 
+//		:Reg(id,dtype, nxtNum,pre_num){}
+//	UINT_64 getUIntData() { return (UINT_64)*(UInt<32> *)this->Data; }
+//	//SINT_64 getSIntData() { return (UINT_64)*(UInt<32> *)this->Data; }
+//	static Node * Create(int id, int dtype, int nxtNum, int pre_num) { Node * ptr = new Reg1(id, dtype, nxtNum, 1);
+//		ptr->Data = new UInt<32>(0);
+//		(*ptr->preTbl).push_back(1);
+//		return ptr;
+//	}
+//};
 //
 //class Reg1 :public Node
 //{

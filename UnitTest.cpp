@@ -1,18 +1,10 @@
 #include "pch.h"
-#include "Uint.h"
-#include "Type.h"
-
-
-#if 0
-using namespace std;
+#include "IRDecoder.h"
 
 int main() {
-	Uint<8> a(0x32);
-	Uint<8> b(0x32);
-	Uint<8> c;
-	(a*a).tail<1>().tail<1>();
-	//printf("%u\n", );
-
+	std::string path = "./Data/NoopOutput.in";
+	IRDecoder *p = new IRDecoder();
+	p->InitFile(path);
+	//IRDecoder::InitFile(path);
+	return 0;
 }
-
-#endif
