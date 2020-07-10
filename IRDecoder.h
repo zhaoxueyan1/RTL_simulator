@@ -19,10 +19,17 @@ class Node(var name:String,
 struct IRDecoder {
 
 	static const int maxn = 5e5 + 7;
+	
 	std::vector<int>RegSet;
 	std::vector<int>Graph[maxn];
 	std::vector<int>reverseGraph[maxn];
 	std::vector<int>instanceGraph[300];
+	
+	// (name,father's name) -> id
+	std::map<std::pair<std::string,std::string>,int>InstanceIdMp;
+	
+	// (id,signal name) -> signal id
+	std::map<std::string,int>InstnceChildMP[300];
 
 	int InstanceNum;
 	int InstanceEdgeNum;
@@ -64,7 +71,15 @@ struct IRDecoder {
 
 	};
 
-	
+	void ConstructInstanceGraph(){
+		InstanceIdMp.insert({std::make_pair(InstanceSet[0].name,"Top"),0});
+		for(int i=0;i<InstanceNum;i++) {
+			auto & t = instanceGraph[i];
+			for(auto z:t){
+				InstanceIdMp.insert({std::make_pair(InstanceSet[z].name,InstanceSet[i].name),z});
+			}
+		}
+	}	
 	std::string PreTrans(int s,int fa) {
 		auto& tnode = NodeSet[s];
 		std::string res = tnode.type+" ";
@@ -113,9 +128,9 @@ struct IRDecoder {
 	void InitFile(std::string path) {
 		std::ifstream  afile;
 		afile.open(path);
-		int id, wid;
+		int id, wid,insID;
 		std::string name, cppType, dir, type, ext;
-		std::string insID, insName, mouName;
+		std::string insName, mouName;
 		afile >> InstanceNum;
 		for (int i = 0; i < InstanceNum; i++) {
 			afile >> id >> insName >> mouName;
@@ -131,6 +146,7 @@ struct IRDecoder {
 		afile >> NodeNum;
 		for (int i = 0; i < NodeNum; i++) {
 			afile >> id >>
+				insID>>
 				name >>
 				type >>
 				cppType >>
@@ -146,6 +162,7 @@ struct IRDecoder {
 			t.expr = ext;
 			t.cppWidth = wid;
 			IRDecoder::NodeSet[id] = t;
+			InstnceChildMP[insID].insert({name,id});
 			if (type == "Node" || type == "Reg" || type == "wire") {
 				RegSet.push_back(id);
 			}
@@ -163,6 +180,7 @@ struct IRDecoder {
 			Graph[u].push_back(v);
 			reverseGraph[v].push_back(u);
 		}
+		ConstructInstanceGraph();
 	}
 };
 
