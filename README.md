@@ -2,7 +2,7 @@
 
 ## Architecture
 
-![](./pic/Architecture.png)
+![](./pic/architecture.png)
 
 ## TODO List
 
