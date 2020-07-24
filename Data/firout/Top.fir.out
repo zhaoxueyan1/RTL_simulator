@@ -1,0 +1,44 @@
+3
+0 Top Top
+1 t1 Passthroughs
+2 t1 AND
+2
+2 1
+1 0
+19
+4 0 io_out Port UInt 4 Output  Node
+9 1 io_out Port UInt 4 Output  Node
+5 1 clock Port ClockType 1 Input  Node
+15 2 Tail15 Tail UInt 0 None  1
+3 0 io_in_b Port UInt 4 Input  Node
+1 0 reset Port UInt 1 Input  Node
+7 1 io_in_a Port UInt 4 Input  Node
+11 2 io_b Port UInt 1 Input  Node
+14 2 _T Node UInt 1 None  None
+13 2 Add13 Add UInt 1 None  None
+2 0 io_in_a Port UInt 4 Input  Node
+17 1 Bits17 Bits UInt 1 0  (0,0)
+8 1 io_in_b Port UInt 4 Input  Node
+12 2 io_c Port UInt 1 Output  Node
+16 2 _T_1 Node UInt 0 None  None
+0 0 clock Port ClockType 1 Input  Node
+6 1 reset Port UInt 1 Input  Node
+10 2 io_a Port UInt 1 Input  Node
+18 1 Bits18 Bits UInt 1 0  (0,0)
+16
+13 10
+13 11
+14 13
+15 14
+16 15
+12 16
+9 12
+17 7
+10 17
+18 8
+11 18
+4 9
+5 0
+6 1
+7 2
+8 3
