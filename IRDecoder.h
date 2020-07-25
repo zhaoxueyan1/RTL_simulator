@@ -128,9 +128,9 @@ struct IRDecoder {
 	bool getFlag(int typeID) {
 		switch (level)
 		{
-		case 0:return typeID == FuncType::Node || typeID == FuncType::Wire || typeID == FuncType::Reg; break;
-		case 1:return typeID == FuncType::Wire || typeID == FuncType::Reg; break;
-		case 2:return typeID == FuncType::Reg; break;
+		case 0:return typeID == FuncType::Node || typeID == FuncType::Wire || typeID == FuncType::Reg || typeID == FuncType::Port; break;
+		case 1:return typeID == FuncType::Wire || typeID == FuncType::Reg || typeID == FuncType::Port; break;
+		case 2:return typeID == FuncType::Reg ||typeID==FuncType::Port; break;
 		default:
 			break;
 		}
@@ -159,6 +159,12 @@ struct IRDecoder {
 		case 1: {
 			switch (tnode.typeID)
 			{
+			case FuncType::Node:{
+				return PreTrans(p[0], s);
+				break;
+			}
+			case FuncType::Bits:{
+			}
 			default:
 				break;
 			}
@@ -263,7 +269,7 @@ struct IRDecoder {
 			t.typeID = getTypeID(type);
 			IRDecoder::NodeSet[id] = t;
 			InstnceChildMP[insID].insert({name,id});
-			bool flag = getFlag(t.typeID);
+			bool flag = getFlag(t.typeID)&&t.typeID!=FuncType::Port;
 			if (flag) {
 				RegSet.push_back(id);
 			}
