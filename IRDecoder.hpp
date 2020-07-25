@@ -19,7 +19,9 @@ class Node(var name:String,
 struct IRDecoder {
 
 	static const int maxn = 5e5 + 7;
-	
+
+	IRDecoder(int level=0) :level(level){}
+	int level;
 	std::vector<int>RegSet;
 	std::vector<int>Graph[maxn];
 	std::vector<int>reverseGraph[maxn];
@@ -56,10 +58,10 @@ struct IRDecoder {
 	}NodeSet[maxn];
 
 	int getTypeID(std::string type) {
-		if (type == "Wire") return FuncType::Wire;
+		if (type == "wire") return FuncType::Wire;
 		else if (type == "Node") return FuncType::Node;
 		else if (type == "Mux") return FuncType::Mux;
-		else if (type == "UIntLiteral") return FuncType::UIntLite;
+		else if (type == "UIntLiteral") return FuncType::UIntLiteral;
 		else if (type == "Eq") return FuncType::Eq;
 		else if (type == "Port") return FuncType::Port;
 		else if (type == "Bits") return FuncType::Bits;
@@ -118,12 +120,32 @@ struct IRDecoder {
 			}
 		}
 	}
-	
-	std::string PreTrans(int s,int fa) {
+	/*
+	level 0: include Reg Wire Node
+	level 1: include Reg Wire
+	level 2: include Reg
+	*/
+	bool getFlag(int typeID,int level) {
+		switch (level)
+		{
+		case 0:return typeID == FuncType::Node || typeID == FuncType::Wire || typeID == FuncType::Reg; break;
+		case 1:return typeID == FuncType::Wire || typeID == FuncType::Reg; break;
+		case 2:return typeID == FuncType::Reg; break;
+		default:
+			break;
+		}
+		throw "Error level";
+	}
+	std::string PreTrans(int s,int fa,int flag) {
 		auto& tnode = NodeSet[s];
-		std::string res = tnode.type;
+		std::string res = tnode.type+std::to_string(tnode.id);
+		if (tnode.type == "UIntLiteral") {
+			res = tnode.expr;
+			assert();
+		}
 		auto& p = Graph[s];
-		if (tnode.typeID == FuncType::Node || tnode.typeID == FuncType::Wire || tnode.typeID == FuncType::Reg)
+		
+		if (flag)
 		{
 			if (fa == -1) {
 				res=tnode.name+"=";
@@ -132,22 +154,41 @@ struct IRDecoder {
 				return tnode.name;
 			}
 		}
-			
 		switch (p.size())
 		{
 		case 1: {
-			return res+ "(" +PreTrans(p[0], s)+")";
+			switch (tnode.typeID)
+			{
+			default:
+				break;
+			}
+			return res+ "(" +PreTrans(p[0], s,flag)+")";
 		}
 		case 2: {
-			return res+ "(" + PreTrans(p[0], s)+","+ PreTrans(p[1], s) + ")";
+			switch (tnode.typeID)
+			{
+			default:
+				break;
+			}
+			return res+ "(" + PreTrans(p[0], s,flag)+","+ PreTrans(p[1], s,flag) + ")";
 		}
 		case 3: {
-			return res+ "(" + PreTrans(p[0], s) + "," + PreTrans(p[1], s)+","+ PreTrans(p[2], s) + ")";
+			switch (tnode.typeID)
+			{
+			default:
+				break;
+			}
+			return res + "(" + PreTrans(p[0], s, flag) + "," + PreTrans(p[1], s, flag) + "," + PreTrans(p[2], s, flag) + ")";
 		}
 		default:
 			break;
 		}
 		return res;
+	}
+
+	void transform() {
+
+
 	}
 
 	void Generate(std::string path) {
@@ -177,7 +218,7 @@ struct IRDecoder {
 		ofile.open(path);
 
 		for (int i = 0; i < RegSet.size(); i++) {
-			ofile <<PreTrans(RegSet[i],-1)<<std::endl;
+			ofile <<PreTrans(RegSet[i],-1,level)<<std::endl;
 		}
 		ofile.close();
 	}
@@ -222,7 +263,8 @@ struct IRDecoder {
 			t.typeID = getTypeID(type);
 			IRDecoder::NodeSet[id] = t;
 			InstnceChildMP[insID].insert({name,id});
-			if (type == "Node" || type == "Reg" || type == "wire") {
+			bool flag = getFlag(t.typeID,level);
+			if (flag) {
 				RegSet.push_back(id);
 			}
 #if Analysis
@@ -231,8 +273,8 @@ struct IRDecoder {
 			WidMP[wid] += 1;
 
 #endif // Analysis
-
 		}
+		
 		afile >> NodeEdgeNum;
 		for (int i = 0; i < NodeEdgeNum; i++) {
 			afile >> u >> v;
