@@ -125,7 +125,7 @@ struct IRDecoder {
 	level 1: include Reg Wire
 	level 2: include Reg
 	*/
-	bool getFlag(int typeID,int level) {
+	bool getFlag(int typeID) {
 		switch (level)
 		{
 		case 0:return typeID == FuncType::Node || typeID == FuncType::Wire || typeID == FuncType::Reg; break;
@@ -136,15 +136,15 @@ struct IRDecoder {
 		}
 		throw "Error level";
 	}
-	std::string PreTrans(int s,int fa,int flag) {
+	std::string PreTrans(int s,int fa) {
 		auto& tnode = NodeSet[s];
-		std::string res = tnode.type+std::to_string(tnode.id);
+		std::string res = tnode.type;
 		if (tnode.type == "UIntLiteral") {
 			res = tnode.expr;
-			assert();
+			//assert("");
 		}
 		auto& p = Graph[s];
-		
+		bool flag = getFlag(tnode.typeID);
 		if (flag)
 		{
 			if (fa == -1) {
@@ -162,7 +162,7 @@ struct IRDecoder {
 			default:
 				break;
 			}
-			return res+ "(" +PreTrans(p[0], s,flag)+")";
+			return res+ "(" +PreTrans(p[0], s)+")";
 		}
 		case 2: {
 			switch (tnode.typeID)
@@ -170,7 +170,7 @@ struct IRDecoder {
 			default:
 				break;
 			}
-			return res+ "(" + PreTrans(p[0], s,flag)+","+ PreTrans(p[1], s,flag) + ")";
+			return res+ "(" + PreTrans(p[0], s)+","+ PreTrans(p[1], s) + ")";
 		}
 		case 3: {
 			switch (tnode.typeID)
@@ -178,7 +178,7 @@ struct IRDecoder {
 			default:
 				break;
 			}
-			return res + "(" + PreTrans(p[0], s, flag) + "," + PreTrans(p[1], s, flag) + "," + PreTrans(p[2], s, flag) + ")";
+			return res + "(" + PreTrans(p[0], s) + "," + PreTrans(p[1], s) + "," + PreTrans(p[2], s) + ")";
 		}
 		default:
 			break;
@@ -218,7 +218,7 @@ struct IRDecoder {
 		ofile.open(path);
 
 		for (int i = 0; i < RegSet.size(); i++) {
-			ofile <<PreTrans(RegSet[i],-1,level)<<std::endl;
+			ofile <<PreTrans(RegSet[i],-1)<<std::endl;
 		}
 		ofile.close();
 	}
@@ -263,7 +263,7 @@ struct IRDecoder {
 			t.typeID = getTypeID(type);
 			IRDecoder::NodeSet[id] = t;
 			InstnceChildMP[insID].insert({name,id});
-			bool flag = getFlag(t.typeID,level);
+			bool flag = getFlag(t.typeID);
 			if (flag) {
 				RegSet.push_back(id);
 			}
