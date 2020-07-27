@@ -22,11 +22,12 @@ struct IRDecoder {
 
 	IRDecoder(int level=0) :level(level){}
 	int level;
+	int inDegree[maxn];
 	std::vector<int>RegSet;
 	std::vector<int>Graph[maxn];
 	std::vector<int>reverseGraph[maxn];
 	std::vector<int>instanceGraph[300];
-	
+	std::vector<int>Reorder;
 	// (name,father's name) -> id
 	std::map<std::pair<std::string,std::string>,int>InstanceIdMp;
 	
@@ -92,6 +93,7 @@ struct IRDecoder {
 		else if (type == "Shr") return FuncType::Shr;
 		else if (type == "AsSInt") return FuncType::AsSInt;
 		else if (type == "Mul") return FuncType::Mul;
+		else if (type == "Leq") return FuncType::Leq;
 		else throw "Error";
 	}
 #if Analysis
@@ -136,6 +138,7 @@ struct IRDecoder {
 		}
 		throw "Error level";
 	}
+
 	std::string PreTrans(int s,int fa) {
 		auto& tnode = NodeSet[s];
 		std::string res = tnode.type;
@@ -164,6 +167,8 @@ struct IRDecoder {
 				break;
 			}
 			case FuncType::Bits:{
+				assert(tnode.expr.length() >= 5);
+				return res + "(" + PreTrans(p[0], s) + ","+ tnode.expr.substr(3,tnode.expr.length()-2)+ ")";
 			}
 			default:
 				break;
@@ -222,13 +227,67 @@ struct IRDecoder {
 #endif
 		std::ofstream ofile;
 		ofile.open(path);
-
+		TopologicalSort();
+		for (int i = 0; i < NodeNum; i++) {
+			ofile << i << " " << Reorder[i] << " " << NodeSet[i].type << std::endl;
+		}
 		for (int i = 0; i < RegSet.size(); i++) {
-			ofile <<PreTrans(RegSet[i],-1)<<std::endl;
+			if(NodeSet[RegSet[i]].typeID!=FuncType::Port)
+				ofile <<PreTrans(RegSet[i],-1)<<std::endl;
 		}
 		ofile.close();
 	}
 
+	void TopologicalSort() {
+		
+		for (int i = 0; i < NodeNum; i++) {
+			std::cout << inDegree[i] << std::endl;
+		}
+		std::vector<int> s;
+		for (int i = 0; i < RegSet.size(); i++) {
+			int k = RegSet[i];
+			Reorder[k] = i;
+			for (int j = 0; j < reverseGraph[k].size(); j++) {
+				int u = reverseGraph[k][j];
+				std::cout<< u <<std::endl;
+				inDegree[u]--;
+				if (!inDegree[u]&&NodeSet[u].typeID != FuncType::Reg&&NodeSet[u].typeID != FuncType::Port) {
+					s.push_back(u);
+				}
+			}
+		}
+		int count = RegSet.size();
+		for(int i=0;i<NodeNum;i++){
+			int u = i;
+			if (!inDegree[u]&&NodeSet[u].typeID != FuncType::Reg&&NodeSet[u].typeID != FuncType::Port) {
+				s.push_back(u);
+				count++;
+			}
+		}
+		int i, k;
+		std::vector<int>res;
+		//ArcNode *p;
+		while (!s.empty()) {
+			i = s.back();
+			s.pop_back();
+			res.push_back(i);
+			//cout << G.vertices[i].data << "->";
+			count++;
+			for (auto k:reverseGraph[i]) {
+				assert(k < maxn);
+				inDegree[k]--;
+				auto& tt = NodeSet[k];
+				if (inDegree[k]&&tt.typeID!=FuncType::Reg&&tt.typeID!=FuncType::Port)
+					s.push_back(k);
+			}
+		}
+		for (int i = 0; i < res.size(); i++) {
+			Reorder[res[i]] = RegSet.size()+i;
+		}
+		if (count < NodeNum) {
+			 throw "Reorder Error";
+		}
+	}
 
 	void InitFile(std::string path) {
 		std::ifstream  afile;
@@ -257,6 +316,7 @@ struct IRDecoder {
 				cppType >>
 				wid >>
 				dir;
+			Reorder.push_back(i);
 			IRDecoder::Node t;
 			getline(afile,ext);
 			t.id = id;
@@ -267,9 +327,14 @@ struct IRDecoder {
 			t.expr = ext;
 			t.cppWidth = wid;
 			t.typeID = getTypeID(type);
+			/*auto a = new std::vector<int>;
+			auto b = new std::vector<int>;
+			
+			Graph.push_back(*a);
+			reverseGraph.push_back(*b);*/
 			IRDecoder::NodeSet[id] = t;
 			InstnceChildMP[insID].insert({name,id});
-			bool flag = getFlag(t.typeID)&&t.typeID!=FuncType::Port;
+			bool flag = getFlag(t.typeID);
 			if (flag) {
 				RegSet.push_back(id);
 			}
@@ -285,6 +350,7 @@ struct IRDecoder {
 		for (int i = 0; i < NodeEdgeNum; i++) {
 			afile >> u >> v;
 			Graph[u].push_back(v);
+			inDegree[u]++;
 			reverseGraph[v].push_back(u);
 		}
 		ConstructInstanceGraph();
