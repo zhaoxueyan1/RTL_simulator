@@ -6,82 +6,70 @@
 struct Number
 {
 	int w;
+	// True  :postive , False :negtive
 	bool sign;
-	size_t length;
-	std::vector<int> num;
-	static const int WIDTH = 9;
-	static const int BASE = 1000000000;
-	Number(bool sign = 0, int w = 32, long long x = 0)
+	// 选用64位和32位的问题，主要考虑的是CPU种寄存器有64位，可能仿真时候直接进行64位加法
+	std::vector<uint32_t> num;
+	uint32_t mask;
+	static const int WIDTH = 32;// 每位最多
+	static const uint32_t BASE = 0Xffffffff;
+
+	Number(bool sign = true, int w = 32, long long x = 0)
 		:sign(sign), w(w)
 	{
 		*this = x;
+		int t = w % (WIDTH+1);
+		mask = t==WIDTH?BASE:(1<<t+1)-1;
 	}
+
 	Number(const Number &x) { *this = x; }
-	void cutLeadingZero() {
-		while (num.back() == 0 && num.size() != 1) {
-			num.pop_back();
-		}
-		int tmp = num.back();
-		if (tmp == 0) {
-			length = 1;
-		}
-		else {
-			length = (num.size() - 1) * WIDTH;
-			while (tmp > 0) {
-				length++;
-				tmp /= 10;
-			}
-		}
-	}
+	
 	Number &operator=(long long x) {
+		sign = x > 0 ? true : false;
 		num.clear();
-		if (x >= 0) {
-			sign = true;
-		}
-		else {
-			sign = false;
-			x = -x;
-		}
 		do {
-			num.push_back(x % BASE);
-			x /= BASE;
+			num.push_back(x & BASE);
+			x >>(WIDTH);
 		} while (x > 0);
-		cutLeadingZero();
+		for (int i = 0; i <ceil(1.*w/WIDTH)-num.size() ; i++) {
+			num.push_back(0);
+		}
 		return *this;
 	}
-	Number &operator=(const std::string &str)
-	{
+	//Has a bug
+	Number &operator=(const std::string &str) {
 		num.clear();
 		sign = (str[0] != '-'); //设置符号
-		int x, len = (str.size() - 1 - (!sign)) / WIDTH + 1;
-		for (int i = 0; i < len; i++)
-		{
-			int End = str.size() - i * WIDTH;
-			int start = std::max((int)(!sign), End - WIDTH); //防止越界
-			sscanf(str.substr(start, End - start).c_str(), "%d", &x);
-			num.push_back(x);
+		int ww = WIDTH / 4;
+		int x, len = ceil(1.* (str.size() - 1 - (!sign)) / ww);
+		for (int i = 0; i < len; i++) {
+			int End = str.size() - i * ww;
+			int start = std::max((int)(!sign), End - ww); //防止越界
+			sscanf(str.substr(start, End - start).c_str(), "%x", &x);
+			num[i] = x;
 		}
-		cutLeadingZero();
+		for (int i = 0; i < ceil(1.*w / WIDTH) - num.size(); i++) {
+			num.push_back(0);
+		}
 		return *this;
 	}
-	Number &operator=(const Number &tmp)
-	{
+
+	Number &operator=(const Number &tmp) {
 		w = tmp.w;
 		num = tmp.num;
 		sign = tmp.sign;
-		length = tmp.length;
+		w = tmp.w;
 		return *this;
 	}
-	//绝对值
-	Number abs() const
-	{
+
+	Number abs() const {
 		Number ans(*this);
-		ans.sign = true;
+		ans.sign = false;
 		return ans;
 	}
-	//正号
+	
 	const Number &operator+() const { return *this; }
-	//负号
+	
 	Number operator-() const
 	{
 		Number ans(*this);
@@ -89,21 +77,16 @@ struct Number
 			ans.sign = !ans.sign;
 		return ans;
 	}
-	// + 运算符
-	Number operator+(const Number &b) const
-	{
-		if (!b.sign)
-		{
+	
+	Number operator+(const Number &b) const {
+		if (!b.sign) {
 			return *this - (-b);
 		}
-		if (!sign)
-		{
+		if (!sign) {
 			return b - (-*this);
 		}
-		Number ans(this->w);
-		ans.num.clear();
-		for (int i = 0, g = 0;; i++)
-		{
+		Number ans(false,std::max(this->w,b.w),0);
+		for (int i = 0, g = 0;; i++) {
 			if (g == 0 && i >= num.size() && i >= b.num.size())
 				break;
 			int x = g;
@@ -111,100 +94,107 @@ struct Number
 				x += num[i];
 			if (i < b.num.size())
 				x += b.num[i];
-			ans.num.push_back(x % BASE);
-			g = x / BASE;
+			ans.num[i] = x & BASE;
+			g = x >>WIDTH;
 		}
-		ans.cutLeadingZero();
 		return ans;
 	}
+	
 	// - 运算符
-	Number operator-(const Number &b) const
-	{
-		if (!b.sign)
-		{
+	Number operator-(const Number &b) const {
+		Number ans(false,std::max(this->w,b.w)+1,0);
+		if (b.sign) {
 			return *this + (-b);
 		}
-		if (!sign)
-		{
+		if (sign) {
 			return -((-*this) + b);
 		}
-		if (*this < b)
-		{
-			return -(b - *this);
-		}
-		Number ans;
-		ans.num.clear();
-		for (int i = 0, g = 0;; i++)
-		{
-			if (g == 0 && i >= num.size() && i >= b.num.size())
-				break;
-			int x = g;
-			g = 0;
-			if (i < num.size())
-				x += num[i];
-			if (i < b.num.size())
-				x -= b.num[i];
-			if (x < 0)
-			{
-				x += BASE;
-				g = -1;
+		if ((*this)<b) {
+			/*return -(b - *this);*/
+			ans.sign = false;
+			for (int i = 0, long long g = 0;; i++) {
+				if (g == 0 && i >= num.size() && i >= b.num.size())
+					break;
+				long long x = g;
+				g = 0;
+				if (i < b.num.size())
+					x += b.num[i];
+				if (i < num.size())
+					x -= num[i];
+				if (x < 0) {
+					x += BASE;
+					g = -1;
+				}
+				ans.num[i] = x;
 			}
-			ans.num.push_back(x);
 		}
-		ans.cutLeadingZero();
+		else {
+			for (int i = 0, long long g = 0;; i++) {
+				if (g == 0 && i >= num.size() && i >= b.num.size())
+					break;
+				long long x = g;
+				g = 0;
+				if (i < num.size())
+					x += num[i];
+				if (i < b.num.size())
+					x -= b.num[i];
+				if (x < 0) {
+					x += BASE;
+					g = -1;
+				}
+				ans.num[i] = x;
+			}
+		}
+		
 		return ans;
 	}
+
 	// * 运算符
-	Number operator*(const Number &b) const
-	{
+	Number operator*(const Number &b) const {
 		int lena = num.size(), lenb = b.num.size();
-		Number ans;
-		for (int i = 0; i < lena + lenb; i++)
-			ans.num.push_back(0);
-		for (int i = 0, g = 0; i < lena; i++)
-		{
+		Number ans(false,this->w+b.w,0);
+		for (int i = 0, g = 0; i < lena; i++) {
 			g = 0;
-			for (int j = 0; j < lenb; j++)
-			{
+			for (int j = 0; j < lenb; j++) {
 				long long x = ans.num[i + j];
 				x += (long long)num[i] * (long long)b.num[j];
-				ans.num[i + j] = x % BASE;
-				g = x / BASE;
+				ans.num[i + j] = x & BASE;
+				g = x >> WIDTH;
 				ans.num[i + j + 1] += g;
 			}
 		}
-		ans.cutLeadingZero();
-		ans.sign = (ans.length == 1 && ans.num[0] == 0) || (sign == b.sign);
+		ans.sign = !(sign==b.sign);
 		return ans;
 	}
-	//*10^n 大数除大数中用到
-	Number e(size_t n) const
-	{
-		int tmp = n % WIDTH;
-		Number ans;
-		ans.length = n + 1;
-		n /= WIDTH;
-		while (ans.num.size() <= n)
-			ans.num.push_back(0);
-		ans.num[n] = 1;
-		while (tmp--)
-			ans.num[n] *= 10;
-		return ans * (*this);
-	}
-	// /运算符 (大数除大数)
+	////*10^n 大数除大数中用到
+	//Number e(size_t n) const
+	//{
+	//	int tmp = n % WIDTH;
+	//	Number ans;
+	//	ans.length = n + 1;
+	//	n /= WIDTH;
+	//	while (ans.num.size() <= n)
+	//		ans.num.push_back(0);
+	//	ans.num[n] = 1;
+	//	while (tmp--)
+	//		ans.num[n] *= 10;
+	//	return ans * (*this);
+	//}
+	// 运算符 (大数除大数)
+	
+	// bug
 	Number operator/(const Number &b) const
 	{
 		Number aa((*this).abs());
 		Number bb(b.abs());
 		if (aa < bb)
 			return 0;
-		char *str = new char[aa.length + 1];
-		memset(str, 0, sizeof(char) * (aa.length + 1));
-		Number tmp;
-		int lena = aa.length, lenb = bb.length;
+		char *str = new char[ceil(1.*aa.w/4)];
+		Number tmp(aa.sign,aa.w,0);
+		int lena = aa.w, lenb = bb.w;
 		for (int i = 0; i <= lena - lenb; i++)
 		{
-			tmp = bb.e(lena - lenb - i);
+			tmp = 0;
 			while (aa >= tmp)
 			{
 				str[i]++;
@@ -221,9 +211,30 @@ struct Number
 	bool opearator() const {
 		return 1;
 	}
+	//bug
 	Number operator%(const Number &b) const
 	{
-		return *this - *this / b * b;
+		Number aa((*this).abs());
+		Number bb(b.abs());
+		if (aa < bb)
+			return 0;
+		char *str = new char[ceil(1.*aa.w / 4)];
+		Number tmp(aa.sign, aa.w, 0);
+		int lena = aa.w, lenb = bb.w;
+		for (int i = 0; i <= lena - lenb; i++)
+		{
+			tmp = 0;
+			while (aa >= tmp)
+			{
+				str[i]++;
+				aa = aa - tmp;
+			}
+			str[i] += '0';
+		}
+		Number ans(str);
+		delete[] str;
+		ans.sign = (ans == 0 || sign == b.sign);
+		return ans;
 	}
 	// ++ 运算符
 	Number &operator++()
@@ -339,4 +350,16 @@ struct Number
 
 	}
 
+};
+
+class SInt :public Number {
+	SInt(int w=32,int x=0) 
+		:Number(true,w,x)
+	{}
+};
+
+class UInt :public Number {
+	UInt(int w = 32, int x = 0)
+		:Number(true, w, x)
+	{}
 };
