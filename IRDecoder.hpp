@@ -228,9 +228,9 @@ struct IRDecoder {
 		std::ofstream ofile;
 		ofile.open(path);
 		TopologicalSort();
-		for (int i = 0; i < NodeNum; i++) {
+		/*for (int i = 0; i < NodeNum; i++) {
 			ofile << i << " " << Reorder[i] << " " << NodeSet[i].type << std::endl;
-		}
+		}*/
 		for (int i = 0; i < RegSet.size(); i++) {
 			int k = Reorder[RegSet[i]];
 			if(NodeSet[k].typeID!=FuncType::Port)
