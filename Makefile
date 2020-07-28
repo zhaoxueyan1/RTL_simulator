@@ -1,15 +1,15 @@
 cc = g++
 prom = simulator
-deps = $(shell find ./ -name "*.h")
-src = $(shell find ./ -name "*.cpp")
+deps = $(shell ls | find *.h)
+src = $(shell ls | find *.cpp)
 obj = $(src:%.cpp=%.o)
-
-$(prom): $(obj)
-	$(cc) -o $(prom) $(obj)
 
 %.o: %.cpp $(deps)
 	$(cc) -c $< -o $@
-
+IRDecoder.o: IRDecoder.hpp $(dpes)
+	$(cc) -c $< -o $@
+$(prom): $(obj)
+	$(cc) -o $(prom) $(obj)
 
 clean:
 	rm -rf $(obj) $(prom)
