@@ -232,24 +232,25 @@ struct IRDecoder {
 			ofile << i << " " << Reorder[i] << " " << NodeSet[i].type << std::endl;
 		}
 		for (int i = 0; i < RegSet.size(); i++) {
-			if(NodeSet[RegSet[i]].typeID!=FuncType::Port)
-				ofile <<PreTrans(RegSet[i],-1)<<std::endl;
+			int k = Reorder[RegSet[i]];
+			if(NodeSet[k].typeID!=FuncType::Port)
+				ofile <<PreTrans(k,-1)<<std::endl;
 		}
 		ofile.close();
 	}
 
 	void TopologicalSort() {
 		
-		for (int i = 0; i < NodeNum; i++) {
+		/*for (int i = 0; i < NodeNum; i++) {
 			std::cout << inDegree[i] << std::endl;
-		}
+		}*/
 		std::vector<int> s;
 		for (int i = 0; i < RegSet.size(); i++) {
 			int k = RegSet[i];
 			Reorder[k] = i;
 			for (int j = 0; j < reverseGraph[k].size(); j++) {
 				int u = reverseGraph[k][j];
-				std::cout<< u <<std::endl;
+				//std::cout<< u <<std::endl;
 				inDegree[u]--;
 				if (!inDegree[u]&&NodeSet[u].typeID != FuncType::Reg&&NodeSet[u].typeID != FuncType::Port) {
 					s.push_back(u);
@@ -277,7 +278,7 @@ struct IRDecoder {
 				assert(k < maxn);
 				inDegree[k]--;
 				auto& tt = NodeSet[k];
-				if (inDegree[k]&&tt.typeID!=FuncType::Reg&&tt.typeID!=FuncType::Port)
+				if (!inDegree[k]&&tt.typeID!=FuncType::Reg&&tt.typeID!=FuncType::Port)
 					s.push_back(k);
 			}
 		}
@@ -285,7 +286,8 @@ struct IRDecoder {
 			Reorder[res[i]] = RegSet.size()+i;
 		}
 		if (count < NodeNum) {
-			 throw "Reorder Error";
+			//std::cout<< count<<std::endl;
+			throw "Reorder Error count:"+std::to_string(count);
 		}
 	}
 
