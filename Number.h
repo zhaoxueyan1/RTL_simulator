@@ -9,7 +9,7 @@ struct Number
 	bool sign;
 	size_t length;
 	std::vector<int> num;
-	static const int WIDTH = 8;
+	static const int WIDTH = 9;
 	static const int BASE = 1000000000;
 	Number(bool sign = 0, int w = 32, long long x = 0)
 		:sign(sign), w(w)
@@ -18,36 +18,31 @@ struct Number
 	}
 	Number(const Number &x) { *this = x; }
 	void cutLeadingZero() {
-		while (num.back() == 0 && num.size() != 1)
-		{
+		while (num.back() == 0 && num.size() != 1) {
 			num.pop_back();
 		}
 		int tmp = num.back();
-		if (tmp == 0)
-		{
+		if (tmp == 0) {
 			length = 1;
 		}
-		else
-		{
+		else {
 			length = (num.size() - 1) * WIDTH;
-			while (tmp > 0)
-			{
+			while (tmp > 0) {
 				length++;
 				tmp /= 10;
 			}
 		}
 	}
-	Number &operator=(long long x)
-	{
+	Number &operator=(long long x) {
 		num.clear();
-		if (x >= 0)	{
+		if (x >= 0) {
 			sign = true;
 		}
-		else{
+		else {
 			sign = false;
 			x = -x;
 		}
-		do{
+		do {
 			num.push_back(x % BASE);
 			x /= BASE;
 		} while (x > 0);
@@ -223,6 +218,9 @@ struct Number
 		return ans;
 	}
 	// %运算符
+	bool opearator() const {
+		return 1;
+	}
 	Number operator%(const Number &b) const
 	{
 		return *this - *this / b * b;
@@ -314,6 +312,9 @@ struct Number
 		}
 		return out;
 	}
+
+
+
 	//重载>>使得可以直接输入大数
 	friend std::istream &operator>>(std::istream &in, Number &x)
 	{
@@ -334,4 +335,8 @@ struct Number
 		//x = str.c_str();
 		return in;
 	}
+	Number& bits(int low, int high) {
+
+	}
+
 };

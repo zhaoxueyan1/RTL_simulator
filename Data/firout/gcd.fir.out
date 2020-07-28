@@ -1,96 +1,85 @@
-2
-0 GCD GCD
-1 inputArb GCD1
 1
-1 0
-40
-36 1 _T_22 Node bool 1 None  None
-25 1 _T_19 Node UInt 32 None  None
-37 1 Bits37 Bits Mux 32 31  (31,0)
-30 1 Mux30 Mux Mux 32 None  io_e ? io_a : _GEN_0
-2 1 clock Port ClockType 1 Input  Node
-29 1 _GEN_1 Node Mux 31 None  None
-14 1 Add14 Add UInt 32 None  None
-38 0 x Reg UInt 32 None  None
-34 1 Eq34 Eq bool 1 None  ==
-31 1 _GEN_2 Node Mux 32 None  None
-23 1 _T_18 Node bool 1 None  None
-32 1 Mux32 Mux Mux 32 None  io_e ? io_b : _GEN_1
-18 1 _T_16 Node UInt 31 None  None
+0 GCD GCD
+0
+36
+2 0 io_a Port UInt 32 Input  Node
+27 0 _GEN_1 Node Mux 31 None  None
+17 0 Mux17 Mux Mux 31 None  _T_14 ? _T_16 : x
+12 0 Add12 Add UInt 32 None  None
+22 0 Sub22 Sub UInt 32 None  None
+20 0 Uint20 UIntLiteral UInt 1 None  UInt(0x0,1)
+13 0 Sub13 Sub UInt 32 None  None
+21 0 _T_18 Node bool 1 None  None
+16 0 _T_16 Node UInt 31 None  None
+25 0 _T_20 Node UInt 31 None  None
+7 0 x Reg UInt 32 None  None
+26 0 Mux26 Mux Mux 31 None  _T_18 ? _T_20 : y
+31 0 _GEN_3 Node Mux 32 None  None
+9 0 Gt9 Gt bool 1 None  >
 1 0 reset Port UInt 1 Input  Node
-10 1 y Reg UInt 32 None  None
-8 1 io_v Port UInt 1 Output  Node
-4 1 io_a Port UInt 32 Input  Node
-27 1 _T_20 Node UInt 31 None  None
-20 1 _GEN_0 Node Mux 31 None  None
-28 1 Mux28 Mux Mux 31 None  _T_18 ? _T_20 : y
-26 1 Tail26 Tail UInt 31 None  1
-24 1 Sub24 Sub UInt 32 None  None
-6 1 io_e Port UInt 1 Input  Node
-16 1 _T_15 Node UInt 32 None  None
-17 1 Tail17 Tail UInt 31 None  1
-7 1 io_z Port UInt 32 Output  Node
+4 0 io_e Port UInt 1 Input  Node
+6 0 io_v Port UInt 1 Output  Node
+3 0 io_b Port UInt 32 Input  Node
+15 0 Tail15 Tail UInt 31 None  1
+29 0 _GEN_2 Node Mux 32 None  None
+32 0 Eq32 Eq bool 1 None  ==
+33 0 Uint33 UIntLiteral UInt 1 None  UInt(0x0,1)
+5 0 io_z Port UInt 32 Output  Node
+34 0 _T_22 Node bool 1 None  None
+24 0 Tail24 Tail UInt 31 None  1
+35 0 Bits35 Bits Mux 32 31  (31,0)
 0 0 clock Port ClockType 1 Input  Node
-33 1 _GEN_3 Node Mux 32 None  None
-15 1 Sub15 Sub UInt 32 None  None
-3 1 reset Port UInt 1 Input  Node
-13 1 Sub13 Sub UInt 32 None  None
-21 1 Eq21 Eq bool 1 None  ==
-35 1 Uint35 UIntLiteral UInt 1 None  UInt<1>(0x0)
-9 1 x Reg UInt 32 None  None
-22 1 Uint22 UIntLiteral UInt 1 None  UInt<1>(0x0)
-39 0 y Reg UInt 32 None  None
-12 1 _T_14 Node bool 1 None  None
-5 1 io_b Port UInt 32 Input  Node
-11 1 Gt11 Gt bool 1 None  >
-19 1 Mux19 Mux Mux 31 None  _T_14 ? _T_16 : x
-49
-11 9
-11 10
-12 11
-15 9
-15 10
-14 15
-14 10
-13 14
-13 10
-16 13
+18 0 _GEN_0 Node Mux 31 None  None
+11 0 Sub11 Sub UInt 32 None  None
+8 0 y Reg UInt 32 None  None
+10 0 _T_14 Node bool 1 None  None
+14 0 _T_15 Node UInt 32 None  None
+28 0 Mux28 Mux Mux 32 None  io_e ? io_a : _GEN_0
+30 0 Mux30 Mux Mux 32 None  io_e ? io_b : _GEN_1
+19 0 Eq19 Eq bool 1 None  ==
+23 0 _T_19 Node UInt 32 None  None
+44
+9 7
+9 8
+10 9
+13 7
+13 8
+12 13
+12 8
+11 12
+11 8
+14 11
+15 14
+16 15
+17 10
 17 16
+17 7
 18 17
-19 12
-19 18
-19 9
-20 19
-21 12
-21 22
-23 21
-24 10
-24 9
+19 10
+19 20
+21 19
+22 8
+22 7
+23 22
+24 23
 25 24
+26 21
 26 25
+26 8
 27 26
-28 23
-28 27
-28 10
+28 4
+28 2
+28 18
 29 28
-30 6
 30 4
-30 20
+30 3
+30 27
 31 30
-32 6
-32 5
-32 29
-33 32
-34 10
-34 35
-36 34
-7 9
-8 36
-37 31
-9 37
-10 33
-38 38
-39 39
-2 0
-3 1
-4 38
+32 8
+32 33
+34 32
+5 7
+6 34
+35 29
+7 35
+8 31

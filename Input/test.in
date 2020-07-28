@@ -1,0 +1,37 @@
+19
+7 Port UInt Input t1io_in_a Node
+4 Port UInt Output io_out Node
+5 Port ClockType Input t1clock Node
+12 Port UInt Output t1t1io_c Node
+16 Node UInt None t1t1_T_1 None
+18 Bits UInt 0 Bits18 0
+2 Port UInt Input io_in_a Node
+15 Tail UInt None Tail15 1
+13 Add UInt None Add13 None
+6 Port UInt Input t1reset Node
+17 Bits UInt 0 Bits17 0
+11 Port UInt Input t1t1io_b Node
+0 Port ClockType Input clock Node
+8 Port UInt Input t1io_in_b Node
+9 Port UInt Output t1io_out Node
+14 Node UInt None t1t1_T None
+1 Port UInt Input reset Node
+10 Port UInt Input t1t1io_a Node
+3 Port UInt Input io_in_b Node
+16
+13 10
+13 11
+14 13
+15 14
+16 15
+12 16
+9 12
+17 7
+10 17
+18 8
+11 18
+4 9
+5 0
+6 1
+7 2
+8 3

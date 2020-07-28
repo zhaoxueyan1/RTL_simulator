@@ -1,0 +1,23 @@
+/Debug/
+/Release/
+/x64/
+/Parser/
+*.o
+*.obj
+*.vcd
+simulator
+### VS config ###
+*.sln
+*.vcxproj
+*.user
+
+### STS ###
+
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### webpack ###

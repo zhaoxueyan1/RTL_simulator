@@ -155,7 +155,9 @@
   <ItemGroup>
     <ClInclude Include="Add.h" />
     <ClInclude Include="Comb.h" />
+    <ClInclude Include="function.h" />
     <ClInclude Include="GlobalVar.h" />
+    <ClInclude Include="IRDecoder.hpp" />
     <ClInclude Include="List.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="pch.h" />
@@ -163,7 +165,7 @@
     <ClInclude Include="ReOrder.h" />
     <ClInclude Include="Sint.h" />
     <ClInclude Include="Type.h" />
-    <ClInclude Include="Uint.h" />
+    <ClInclude Include="Number.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Add.cpp" />

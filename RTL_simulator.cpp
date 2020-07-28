@@ -95,9 +95,11 @@ struct Simulator {
 	}
 
 	void CombTrans() {
-		/*for (int i = 0; i < Node::CombSet->size(); i++) {
+		/*
+		for (int i = 0; i < Node::CombSet->size(); i++) {
 				(*Node::CombSet)[i]->GetData();
-		}*/
+		}
+		*/
 		bool vis[10];
 		memset(vis, 0, sizeof(vis));
 		while (!TransQueue.empty()) {

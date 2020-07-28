@@ -1,5 +1,4 @@
 #include "VCDFileParser.hpp"
-#include "cxxopts.hpp"
 #include"../../../IRDecoder.hpp"
 #include <vector>
 
@@ -7,7 +6,7 @@ void print_scope_signals(VCDFile * trace, VCDScope * scope, int instanceID,IRDec
 {
     for(VCDSignal * signal : scope -> signals) {
         std::cout << trace->get_signal_values(signal -> hash)->size() << "\t"
-                    << signal -> reference<<std::endl;
+                    << signal -> reference<<"\t"<<p->InstnceChildMP[instanceID][signal->reference]<<std::endl;
         auto& S = *(trace->get_signal_values(signal -> hash));
         for(auto &i: S){
             std::cout<<i->time<<" ";
@@ -46,8 +45,6 @@ void traverse_scope(std::string parent, VCDFile * trace, VCDScope * scope, IRDec
     std::string local_parent = parent;
     if (parent.length()){
         int id = p->InstanceIdMp[{scope->name,local_parent}];
-        if (true)   
-            std::cout << "Scope: " << local_parent  << std::endl;
         if (true)
             print_scope_signals(trace, scope, id, p);
     }
@@ -61,7 +58,7 @@ void traverse_scope(std::string parent, VCDFile * trace, VCDScope * scope, IRDec
 int main (int argc, char** argv)
 {
 
-    freopen("./output.out","w",stdout);
+    freopen("./valt_dump_split.out","w",stdout);
     std::string infile = "../../../Data/valt_dump_split.vcd";
     std::string graphInfile = "../../../Data/NoopOutput.in";
     VCDFileParser parser;        

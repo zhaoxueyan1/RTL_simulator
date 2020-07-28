@@ -20,7 +20,10 @@
 #include<set>
 #include<fstream>
 #include<string.h>
-
+#include<ostream>
+#include<algorithm>
+#include<assert.h>
+#include<ctime>
 #define UINT_8 unsigned char
 #define UINT_16 unsigned short
 #define UINT_32 unsigned int

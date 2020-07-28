@@ -38,13 +38,14 @@ namespace FuncType
 		Shr,
 		AsSInt,
 		Mul,
+		Leq,
 	};
 };
 
 
 inline Number Mux     (Number &a, Number &b,Number &c) {}
 inline Number Eq	  (Number &a,Number &b){}
-inline Number Bits	  (Number &a,Number &b){}
+inline Number Bits    (Number &a, int low, int high) { return a.bits(low,high); }
 inline Number And	  (Number &a,Number &b){}
 inline Number Reg	  (Number &a,Number &b){} 
 inline Number Or	  (Number &a,Number &b){}
@@ -72,3 +73,4 @@ inline Number Shl	  (Number &a,Number &b){}
 inline Number Shr	  (Number &a,Number &b){}
 inline Number AsSInt  (Number &a,Number &b){}
 inline Number Mul	  (Number &a,Number &b){}
+inline Number Leq	  (Number &a,Number &b){}
