@@ -183,30 +183,34 @@ struct Number
 	// ÔËËã·û (´óÊı³ı´óÊı)
 	
 	// bug
-	Number operator/(const Number &b) const
-	{
-		Number aa((*this).abs());
+	Number operator/(const Number &b) const {
 		Number bb(b.abs());
-		if (aa < bb)
+		Number aa(this->abs());
+		if (*this < bb)
 			return 0;
-		char *str = new char[ceil(1.*aa.w/4)];
-		Number tmp(aa.sign,aa.w,0);
-		int lena = aa.w, lenb = bb.w;
-		for (int i = 0; i <= lena - lenb; i++)
-		{
-			tmp = 0;
-			while (aa >= tmp)
-			{
-				str[i]++;
-				aa = aa - tmp;
-			}
-			str[i] += '0';
+		Number tmp(this->sign,bb.w+1,0);
+		Number ans(this->sign,w,0);
+		for (int i = tmp.num.size() - 2; i >= 0; i++) {
+			tmp.num[i] = num[i];
 		}
-		Number ans(str);
-		delete[] str;
+		int lena = this->num.size(), lenb = bb.num.size();
+		for (int i = 0; i <= lena - lenb; i++) {
+			long long t = 0;
+			while (tmp >= bb) {
+				t++;
+				tmp = tmp - bb;
+			}
+			for (int i = bb.num.size(); i > 0 ; i--) {
+				tmp.num[i] = tmp.num[i - 1];
+			}
+			ans.num[lena-lenb-i] = t;
+			if (i == lena - lenb) break;
+			tmp.num[0] = this->num[lenb + i];
+		}
 		ans.sign = (ans == 0 || sign == b.sign);
 		return ans;
 	}
+
 	// %ÔËËã·û
 	bool opearator() const {
 		return 1;
@@ -214,27 +218,31 @@ struct Number
 	//bug
 	Number operator%(const Number &b) const
 	{
-		Number aa((*this).abs());
 		Number bb(b.abs());
-		if (aa < bb)
+		Number aa(this->abs());
+		if (*this < bb)
 			return 0;
-		char *str = new char[ceil(1.*aa.w / 4)];
-		Number tmp(aa.sign, aa.w, 0);
-		int lena = aa.w, lenb = bb.w;
-		for (int i = 0; i <= lena - lenb; i++)
-		{
-			tmp = 0;
-			while (aa >= tmp)
-			{
-				str[i]++;
-				aa = aa - tmp;
-			}
-			str[i] += '0';
+		Number tmp(this->sign, bb.w + 1, 0);
+		Number ans(this->sign, w, 0);
+		for (int i = tmp.num.size() - 2; i >= 0; i++) {
+			tmp.num[i] = num[i];
 		}
-		Number ans(str);
-		delete[] str;
-		ans.sign = (ans == 0 || sign == b.sign);
-		return ans;
+		int lena = this->num.size(), lenb = bb.num.size();
+		for (int i = 0; i <= lena - lenb; i++) {
+			long long t = 0;
+			while (tmp >= bb) {
+				t++;
+				tmp = tmp - bb;
+			}
+			if (i == lena - lenb) break;
+			for (int i = bb.num.size(); i > 0; i--) {
+				tmp.num[i] = tmp.num[i - 1];
+			}
+			ans.num[lena - lenb - i] = t;
+			tmp.num[0] = this->num[lenb + i];
+		}
+		tmp.sign = (ans == 0 || sign == b.sign);
+		return tmp;
 	}
 	// ++ ÔËËã·û
 	Number &operator++()
@@ -290,19 +298,45 @@ struct Number
 			return -b < -*this;
 		}
 		//ÕıÕı
-		if (num.size() != b.num.size())
+		if (num.size() != b.num.size()) 
 			return num.size() < b.num.size();
 		for (int i = num.size() - 1; i >= 0; i--)
 			if (num[i] != b.num[i])
 				return num[i] < b.num[i];
 		return false;
 	}
+	Number operator<<(const int a) const { 
+		Number res(this->w, w + a, 0);
+		int x = 0;
+		int pos = a % WIDTH;
+		int start = a/WIDTH;
+		for (int i = 0; i < this->num.size(); i++) {
+			res.num[start + i] = x | (this->num[i]<<pos);
+			x = this->num[i] >> (WIDTH - pos);
+		}
+		res.num[start + num.size()] = x;
+		return res; 
+	} 
+	Number operator>>(const int a) const {
+		Number res(this->w, w - a, 0);
+		int x = 0;
+		int pos = a % WIDTH;
+		int start = a / WIDTH;
+		for (int i = res.num.size(); i >= 0; i--) {
+			res.num[i] = x | (this->num[start + i] >> pos);
+			x = this->num[i] << (WIDTH - pos);
+		}
+		return res;
+	}
+	Number& bits(int low, int high)const {
+
+	}
+	
 	bool operator>(const Number &b) const { return b < *this; }                     // >  ÔËËã·û
 	bool operator<=(const Number &b) const { return !(b < *this); }                 // <= ÔËËã·û
 	bool operator>=(const Number &b) const { return !(*this < b); }                 // >= ÔËËã·û
 	bool operator!=(const Number &b) const { return b < *this || *this < b; }       // != ÔËËã·û
-	bool operator==(const Number &b) const { return !(b < *this) && !(*this < b); } //==ÔËËã·û
-	// Âß¼­ÔËËã·û
+	bool operator==(const Number &b) const { return !(b < *this) && !(*this < b); } //==ÔËËã·û																			// Âß¼­ÔËËã·û
 	bool operator||(const Number &b) const { return *this != 0 || b != 0; } // || ÔËËã·û
 	bool operator&&(const Number &b) const { return *this != 0 && b != 0; } // && ÔËËã·û
 	bool operator!() { return (bool)(*this == 0); }                             // £¡ ÔËËã·û
@@ -346,10 +380,6 @@ struct Number
 		//x = str.c_str();
 		return in;
 	}
-	Number& bits(int low, int high) {
-
-	}
-
 };
 
 class SInt :public Number {
