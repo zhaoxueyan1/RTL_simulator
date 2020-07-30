@@ -8,10 +8,10 @@ struct Number
 	int w;
 	// True  :postive , False :negtive
 	bool sign;
-	// Ñ¡ÓÃ64Î»ºÍ32Î»µÄÎÊÌâ£¬Ö÷Òª¿¼ÂÇµÄÊÇCPUÖÖ¼Ä´æÆ÷ÓĞ64Î»£¬¿ÉÄÜ·ÂÕæÊ±ºòÖ±½Ó½øĞĞ64Î»¼Ó·¨
+	// Ñ¡ï¿½ï¿½64Î»ï¿½ï¿½32Î»ï¿½ï¿½ï¿½ï¿½ï¿½â£¬ï¿½ï¿½Òªï¿½ï¿½ï¿½Çµï¿½ï¿½ï¿½CPUï¿½Ö¼Ä´ï¿½ï¿½ï¿½ï¿½ï¿½64Î»ï¿½ï¿½ï¿½ï¿½ï¿½Ü·ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ö±ï¿½Ó½ï¿½ï¿½ï¿½64Î»ï¿½Ó·ï¿½
 	std::vector<uint32_t> num;
 	uint32_t mask;
-	static const int WIDTH = 32;// Ã¿Î»×î¶à
+	static const int WIDTH = 32;// Ã¿Î»ï¿½ï¿½ï¿½
 	static const uint32_t BASE = 0Xffffffff;
 
 	Number(bool sign = true, int w = 32, long long x = 0)
@@ -39,12 +39,12 @@ struct Number
 	//Has a bug
 	Number &operator=(const std::string &str) {
 		num.clear();
-		sign = (str[0] != '-'); //ÉèÖÃ·ûºÅ
+		sign = (str[0] != '-'); //ï¿½ï¿½ï¿½Ã·ï¿½ï¿½ï¿½
 		int ww = WIDTH / 4;
 		int x, len = ceil(1.* (str.size() - 1 - (!sign)) / ww);
 		for (int i = 0; i < len; i++) {
 			int End = str.size() - i * ww;
-			int start = std::max((int)(!sign), End - ww); //·ÀÖ¹Ô½½ç
+			int start = std::max((int)(!sign), End - ww); //ï¿½ï¿½Ö¹Ô½ï¿½ï¿½
 			sscanf(str.substr(start, End - start).c_str(), "%x", &x);
 			num[i] = x;
 		}
@@ -55,10 +55,11 @@ struct Number
 	}
 
 	Number &operator=(const Number &tmp) {
-		w = tmp.w;
-		num = tmp.num;
 		sign = tmp.sign;
-		w = tmp.w;
+		for (int i = 0; i < num.size(); i++) {
+			num[i] = tmp.num[i];
+		}
+		num[num.size() - 1] = num[num.size() - 1] & mask;
 		return *this;
 	}
 
@@ -100,7 +101,7 @@ struct Number
 		return ans;
 	}
 	
-	// - ÔËËã·û
+	// - ï¿½ï¿½ï¿½ï¿½ï¿½
 	Number operator-(const Number &b) const {
 		Number ans(false,std::max(this->w,b.w)+1,0);
 		if (b.sign) {
@@ -109,10 +110,12 @@ struct Number
 		if (sign) {
 			return -((-*this) + b);
 		}
+		long long g = 0;
 		if ((*this)<b) {
 			/*return -(b - *this);*/
 			ans.sign = false;
-			for (int i = 0, long long g = 0;; i++) {
+			long long g = 0;
+			for (int i = 0;; i++) {
 				if (g == 0 && i >= num.size() && i >= b.num.size())
 					break;
 				long long x = g;
@@ -127,9 +130,8 @@ struct Number
 				}
 				ans.num[i] = x;
 			}
-		}
-		else {
-			for (int i = 0, long long g = 0;; i++) {
+		} else {
+			for (int i = 0;; i++) {
 				if (g == 0 && i >= num.size() && i >= b.num.size())
 					break;
 				long long x = g;
@@ -145,11 +147,10 @@ struct Number
 				ans.num[i] = x;
 			}
 		}
-		
 		return ans;
 	}
 
-	// * ÔËËã·û
+	// * ï¿½ï¿½ï¿½ï¿½ï¿½
 	Number operator*(const Number &b) const {
 		int lena = num.size(), lenb = b.num.size();
 		Number ans(false,this->w+b.w,0);
@@ -166,7 +167,7 @@ struct Number
 		ans.sign = !(sign==b.sign);
 		return ans;
 	}
-	////*10^n ´óÊı³ı´óÊıÖĞÓÃµ½
+	////*10^n ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½
 	//Number e(size_t n) const
 	//{
 	//	int tmp = n % WIDTH;
@@ -180,7 +181,7 @@ struct Number
 	//		ans.num[n] *= 10;
 	//	return ans * (*this);
 	//}
-	// ÔËËã·û (´óÊı³ı´óÊı)
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
 	
 	// bug
 	Number operator/(const Number &b) const {
@@ -211,7 +212,7 @@ struct Number
 		return ans;
 	}
 
-	// %ÔËËã·û
+	// %ï¿½ï¿½ï¿½ï¿½ï¿½
 	bool opearator() const {
 		return 1;
 	}
@@ -244,60 +245,60 @@ struct Number
 		tmp.sign = (ans == 0 || sign == b.sign);
 		return tmp;
 	}
-	// ++ ÔËËã·û
+	// ++ ï¿½ï¿½ï¿½ï¿½ï¿½
 	Number &operator++()
 	{
 		*this = *this + 1;
 		return *this;
 	}
-	// -- ÔËËã·û
+	// -- ï¿½ï¿½ï¿½ï¿½ï¿½
 	Number &operator--()
 	{
 		*this = *this - 1;
 		return *this;
 	}
-	// += ÔËËã·û
+	// += ï¿½ï¿½ï¿½ï¿½ï¿½
 	Number &operator+=(const Number &b)
 	{
 		*this = *this + b;
 		return *this;
 	}
-	// -= ÔËËã·û
+	// -= ï¿½ï¿½ï¿½ï¿½ï¿½
 	Number &operator-=(const Number &b)
 	{
 		*this = *this - b;
 		return *this;
 	}
-	// *=ÔËËã·û
+	// *=ï¿½ï¿½ï¿½ï¿½ï¿½
 	Number &operator*=(const Number &b)
 	{
 		*this = *this * b;
 		return *this;
 	}
-	// /= ÔËËã·û
+	// /= ï¿½ï¿½ï¿½ï¿½ï¿½
 	Number &operator/=(const Number &b)
 	{
 		*this = *this / b;
 		return *this;
 	}
-	// %=ÔËËã·û
+	// %=ï¿½ï¿½ï¿½ï¿½ï¿½
 	Number &operator%=(const Number &b)
 	{
 		*this = *this % b;
 		return *this;
 	}
-	// < ÔËËã·û
+	// < ï¿½ï¿½ï¿½ï¿½ï¿½
 	bool operator<(const Number &b) const
 	{
-		if (sign != b.sign) //Õı¸º£¬¸ºÕı
+		if (sign != b.sign) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		{
 			return !sign;
 		}
-		else if (!sign && !b.sign) //¸º¸º
+		else if (!sign && !b.sign) //ï¿½ï¿½ï¿½ï¿½
 		{
 			return -b < -*this;
 		}
-		//ÕıÕı
+		//ï¿½ï¿½ï¿½ï¿½
 		if (num.size() != b.num.size()) 
 			return num.size() < b.num.size();
 		for (int i = num.size() - 1; i >= 0; i--)
@@ -330,40 +331,48 @@ struct Number
 	}
 	Number operator&(const Number&b) const {
 		Number res(this->sign, this->w, 0);
-		for (int i = 0; i < b.num.size; i++) {
+		for (int i = 0; i < b.num.size(); i++) {
 			res.num[i] = this->num[i] & b.num[i];
 		}
 		return res;
 	}
 	Number operator|(const Number&b) const {
 		Number res(this->sign, this->w, 0);
-		for (int i = 0; i < b.num.size; i++) {
+		for (int i = 0; i < b.num.size(); i++) {
 			res.num[i] = this->num[i] | b.num[i];
 		}
 		return res;
 	}
+
 	Number operator^(const Number&b) const {
 		Number res(this->sign, this->w, 0);
-		for (int i = 0; i < b.num.size; i++) {
+		for (int i = 0; i < b.num.size(); i++) {
 			res.num[i] = this->num[i] ^ b.num[i];
 		}
 		return res;
 	}
 	
-	Number& bits(int low, int high)const {
-
+	Number bits(int low, int high) const {
+		Number res(this->sign, high - low + 1, 0);
+		res = *this>>low;
+		return res;
 	}
-	
-	bool operator>(const Number &b) const { return b < *this; }                     // >  ÔËËã·û
-	bool operator<=(const Number &b) const { return !(b < *this); }                 // <= ÔËËã·û
-	bool operator>=(const Number &b) const { return !(*this < b); }                 // >= ÔËËã·û
-	bool operator!=(const Number &b) const { return b < *this || *this < b; }       // != ÔËËã·û
-	bool operator==(const Number &b) const { return !(b < *this) && !(*this < b); } //==ÔËËã·û																			// Âß¼­ÔËËã·û
-	bool operator||(const Number &b) const { return *this != 0 || b != 0; } // || ÔËËã·û
-	bool operator&&(const Number &b) const { return *this != 0 && b != 0; } // && ÔËËã·û
-	bool operator!() { return (bool)(*this == 0); }                             // £¡ ÔËËã·û
 
-	//ÖØÔØ<<Ê¹µÃ¿ÉÒÔÖ±½ÓÊä³ö´óÊı
+	Number cat(const Number & b) const {
+		Number res(*this | b << this->w);
+		return res;
+	}
+
+	bool operator>(const Number &b) const { return b < *this; }                     // >  ï¿½ï¿½ï¿½ï¿½ï¿½
+	bool operator<=(const Number &b) const { return !(b < *this); }                 // <= ï¿½ï¿½ï¿½ï¿½ï¿½
+	bool operator>=(const Number &b) const { return !(*this < b); }                 // >= ï¿½ï¿½ï¿½ï¿½ï¿½
+	bool operator!=(const Number &b) const { return b < *this || *this < b; }       //
+	bool operator==(const Number &b) const { return !(b < *this) && !(*this < b); } //==ï¿½ï¿½ï¿½ï¿½ï¿½																			// ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	bool operator||(const Number &b) const { return *this != 0 || b != 0; } // || ï¿½ï¿½ï¿½ï¿½ï¿½
+	bool operator&&(const Number &b) const { return *this != 0 && b != 0; } // && ï¿½ï¿½ï¿½ï¿½ï¿½
+	bool operator!() { return (bool)(*this == 0); }                             // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
+
+	//ï¿½ï¿½ï¿½ï¿½<<Ê¹ï¿½Ã¿ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	friend std::ostream &operator<<(std::ostream &out, const Number &x)
 	{
 		if (!x.sign)
@@ -372,17 +381,15 @@ struct Number
 		for (int i = x.num.size() - 2; i >= 0; i--)
 		{
 			char buf[10];
-			//ÈçWIDTHºÍBASRÓĞ±ä»¯,´Ë´¦ÒªĞŞ¸ÄÎª%0(WIDTH)d
-			sprintf(buf, "%08d", x.num[i]);
+			//ï¿½ï¿½WIDTHï¿½ï¿½BASRï¿½Ğ±ä»¯,ï¿½Ë´ï¿½Òªï¿½Ş¸ï¿½Îª%0(WIDTH)d
+			sprintf(buf, "%08x", x.num[i]);
 			for (int j = 0; j < strlen(buf); j++)
 				out << buf[j];
 		}
 		return out;
 	}
 
-
-
-	//ÖØÔØ>>Ê¹µÃ¿ÉÒÔÖ±½ÓÊäÈë´óÊı
+	//ï¿½ï¿½ï¿½ï¿½>>Ê¹ï¿½Ã¿ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	friend std::istream &operator>>(std::istream &in, Number &x)
 	{
 		std::string str;
