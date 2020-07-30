@@ -306,7 +306,7 @@ struct Number
 		return false;
 	}
 	Number operator<<(const int a) const { 
-		Number res(this->w, w + a, 0);
+		Number res(this->sign, w + a, 0);
 		int x = 0;
 		int pos = a % WIDTH;
 		int start = a/WIDTH;
@@ -318,7 +318,7 @@ struct Number
 		return res; 
 	} 
 	Number operator>>(const int a) const {
-		Number res(this->w, w - a, 0);
+		Number res(this->sign, w - a, 0);
 		int x = 0;
 		int pos = a % WIDTH;
 		int start = a / WIDTH;
@@ -328,6 +328,28 @@ struct Number
 		}
 		return res;
 	}
+	Number operator&(const Number&b) const {
+		Number res(this->sign, this->w, 0);
+		for (int i = 0; i < b.num.size; i++) {
+			res.num[i] = this->num[i] & b.num[i];
+		}
+		return res;
+	}
+	Number operator|(const Number&b) const {
+		Number res(this->sign, this->w, 0);
+		for (int i = 0; i < b.num.size; i++) {
+			res.num[i] = this->num[i] | b.num[i];
+		}
+		return res;
+	}
+	Number operator^(const Number&b) const {
+		Number res(this->sign, this->w, 0);
+		for (int i = 0; i < b.num.size; i++) {
+			res.num[i] = this->num[i] ^ b.num[i];
+		}
+		return res;
+	}
+	
 	Number& bits(int low, int high)const {
 
 	}
