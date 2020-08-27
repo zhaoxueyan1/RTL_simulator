@@ -24,6 +24,9 @@
 #include<algorithm>
 #include<assert.h>
 #include<ctime>
+#include<cmath>
+#include<functional>
+
 #define UINT_8 unsigned char
 #define UINT_16 unsigned short
 #define UINT_32 unsigned int

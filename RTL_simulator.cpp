@@ -1,28 +1,32 @@
 ﻿#include "pch.h"
 #include "Node.h"
-#include "Reg.h"
-#include "ReOrder.h"
-#include "Comb.h"
 #include "List.h"
 
 using namespace std;
+
 struct Simulator {
-	typedef pair<int, void* >P;
+	typedef pair<int, long long >P;
 
 	vector<P>SetS;
 	queue<int>TransQueue;
 	void Init(int N) {
-		Node::AllSet = new vector<Node*>;
+		Node::AllSet  = new vector<Node*>;
 		Node::CombSet = new vector<Node*>;
-		Node::RegSet = new vector<Node*>;
+		Node::RegSet  = new vector<Node*>;
 
-		//Generate::GenerateNode();
+		Generate::GenerateNode();
 	}
+
 # if 1
 	void Out() {
 		auto& T = (*Node::AllSet);
-		for (int i = 0; i < T.size(); i++) {
-			printf("%u\t", T[i]->getUIntData());
+		for (auto &i:T) {
+			if (i->sign) {
+				cout << *i->getSInt() << endl;
+			}
+			else {
+				cout << *i->getSInt() << endl;
+			}
 		}
 		putchar(10);
 	}
@@ -32,7 +36,6 @@ struct Simulator {
 			auto& t = SetS[i];
 			(*Node::AllSet)[t.first]->SetData(t.second);
 		}
-
 	}
 	
 	void CombTrans() {
@@ -43,7 +46,6 @@ struct Simulator {
 		for (int i = 0; i < T.size();i++) {
 			T[i]->Update();
 #if DEBUG
-
 			printf("Comb %d=%u\n",i,T[i]->getUIntData());
 			Out();
 			//putchar(10);
@@ -52,12 +54,10 @@ struct Simulator {
 		}
 		
 	}
-
 	void RegTrans() {
 		auto& T = (*Node::RegSet);
-		for (int i = 0; i < T.size(); i++) {
-			Reg* t = dynamic_cast< Reg*>(T[i]);
-			t->Update();
+		for (auto& i :T) {
+			i->Update();
 		}
 	}
 # endif
@@ -121,54 +121,60 @@ struct Simulator {
 		}
 	}
 #endif
+	
 	void MoveCycle(vector<P>& t) {
 		for (auto i : t) {
 			SetS.push_back(i);
 		}
 		RegSet();
 		SetS.clear(); 
-		Comb::setFlag += 1;
 		Out();
 		CombTrans();
 		RegTrans();
-		//Out();
 		putchar(10);
+	}
+
+	void run(int N, vector<pair<int, vector<pair<int, int>>>>& Input) { 
+
+		Simulator::Init(N);
+		vector<P>input;
+
+		for (int i = 0; i < N; i++) {
+
+		}
+		putchar(10);
+		int j = 0;
+		
+		for (int i = 0; i < 10; i++) {
+			input.clear();
+			if (j < Input.size() && Input[j].first == i) {
+				for (auto& t : Input[j].second) {
+					input.push_back(make_pair(t.first, t.second));
+				}
+				j++;
+			}
+			Simulator::MoveCycle(input);
+		}
+		Simulator::RegSet();
+
 	}
 };
 
 # if 0
 vector<pair<int,vector<pair<int,int>>>>Input;
 int main() {
-	Simulator::Init(4);
-	vector<P>input;
-
-	printf("io_a\tio_b\tio_e\tio_z\tio_v\tx\ty\t");
-	putchar(10);
-	int j = 0;
 	vector<pair<int, int>>t1;
-	t1.push_back({0,21}); // 给io_a赋值
-	t1.push_back({1,9}); // 给io_b赋值
-	t1.push_back({2,1}); // 给io_e赋值
-	
-	vector<pair<int, int>>t2;
-	t2.push_back({0,21}); // 给io_a赋值
-	t2.push_back({1,9}); // 给io_b赋值
-	t2.push_back({2,0}); // 给io_e赋值
+	t1.push_back({ 0,21 }); // 给io_a赋值
+	t1.push_back({ 1,9 }); // 给io_b赋值
+	t1.push_back({ 2,1 }); // 给io_e赋值
 
-	Input.push_back(make_pair(0,t1));
-	Input.push_back(make_pair(1,t2));
-	for (int i = 0; i < 10; i++) {
-		input.clear();
-		if (j < Input.size() && Input[j].first == i) {
-			for (auto& t : Input[j].second)
-			{
-				input.push_back(make_pair(t.first,new UInt(t.second)));
-			}
-			j++;
-		}
-		Simulator::MoveCycle(input);
-	}
-	Simulator::RegSet();
+	vector<pair<int, int>>t2;
+	t2.push_back({ 0,21 }); // 给io_a赋值
+	t2.push_back({ 1,9 }); // 给io_b赋值
+	t2.push_back({ 2,0 }); // 给io_e赋值
+
+	Input.push_back(make_pair(0, t1));
+	Input.push_back(make_pair(1, t2));
 	return 0;
 }
 # endif

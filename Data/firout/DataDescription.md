@@ -11,7 +11,8 @@ The following line has **Only one** number of **M**, which representes the numbe
 
 ### 1.2 Signal graph
 
-The first line is a number **N**, which represents the number of vertices. And N lines are followed. For the each line, **8** items are expected. They represents ```Id```,```Instance ID```,```Name```,```Type```,```CppType```,```Width```,```Dir``` and ```Ext``` respectively. 
+The first line is a number **N**, which represents the number of vertices. And N lines are followed. For the each line, **8** items are expected. They represents 
+```Id```,```Instance ID```,```Name```,```Type```,```CppType```,```Width```,```Dir``` and ```Ext``` respectively. 
 The following line has **Only one** number of **M**, which representes the number of **edge**. **M** lines are followed, each line has **2** numbers : **u** and **v**. They representes the **sink** and **source** respectively.
 
 Tips: 

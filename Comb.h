@@ -1,17 +1,20 @@
 #pragma once
+#if 0
 #include "pch.h"
 #include "Node.h"
 
 class Comb :public Node 
 {
 public:
-	static int setFlag;
 	static int CombNumber;
 	Comb() {
 	}
-	Comb(int id, int dtype, int pre_num, int nxtNum);
-
+	Comb(int id, int dtype, Func UpdateFunc);
 };
 
-
-
+Comb::Comb(int id, int dtype, Func UpdateFunc)
+	:Node(id, dtype, UpdateFunc)
+{
+	//Comb::CombNumber++;
+}
+#endif

@@ -13,7 +13,6 @@ class Node(var name:String,
 		   var tpe:String,
 		   var expr:String
 		  )
-
 */
 
 struct IRDecoder {

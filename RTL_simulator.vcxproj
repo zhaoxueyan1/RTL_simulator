@@ -163,14 +163,10 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Reg.h" />
     <ClInclude Include="ReOrder.h" />
-    <ClInclude Include="Sint.h" />
-    <ClInclude Include="Type.h" />
-    <ClInclude Include="Number.h" />
+    <ClInclude Include="SInt.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Add.cpp" />
     <ClCompile Include="CodeGenerator.cpp" />
-    <ClCompile Include="Comb.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -179,7 +175,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="RTL_simulator.cpp" />
+    <ClCompile Include="SInt.cpp" />
     <ClCompile Include="TestBench.cpp" />
+    <ClCompile Include="UInt.cpp" />
+    <ClCompile Include="UInt.h" />
     <ClCompile Include="UnitTest.cpp" />
   </ItemGroup>
   <ItemGroup>

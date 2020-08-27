@@ -1,6 +1,7 @@
 #pragma once
 #include"pch.h"
-#include"Type.h"
+#include"UInt.h"
+#include"Sint.h"
 
 using namespace std;
 
@@ -10,40 +11,78 @@ public:
 	void * Data; // the data of this register
 
 public:
+	typedef std::function<void(void)>Func;
+	
 	Node() {}
 	
-	Node(int id, int dType, int nxtNum, int preNum);
+	Node(int id, bool sign, Func func);
 	
-	//static int cntComb; // the number of Comb
-	//static int cntReg;  // the number of Reg
-	int id; // the index of this 
-	int dType;// the type of this register
-	int status=0; // describe the setflag
-	int preNum; // the number of the pre_node
-	vector<int>* preTbl=nullptr; // the pre table
-	int nxtNum; // the number of the next_node
-	vector<int>* nxtTbl=nullptr; // the next table
+
+	// the index of this
+	int id;  
+
+	// the type of this Data
+	bool sign;
+
+	//Is this Node register
+	enum NodeType
+	{
+		Reg,Comb
+	};
+	NodeType Type;
 	
-	void SetArg(int dType, int preNum, int nxtNum);
+/*
+	// describe the setflag
+	int status=0; 
+
+
+	// the number of the pre_node
+	int preNum; 
+
+	// the pre table
+	vector<int>* preTbl=nullptr; 
+	
+	// the number of the next_node
+	int nxtNum; 
+
+	// the next table
+	vector<int>* nxtTbl=nullptr; 
+*/
+	void SetArg(bool sign, int preNum, int nxtNum);
 
 	static int N;
-	static vector<Node*>* AllSet;  // to storge the map to id-Node*
+
+	// to storge the map to id-Node*
+	static vector<Node*>* AllSet;  
 	static vector<Node*>* CombSet;
 	static vector<Node*>* RegSet;
-	static Node * Gptr; // to storge the whole objects
+
+	// UpdateFunc
+	Func Updatefunc;
+
+	inline void Update() {
+		Updatefunc();
+	}
+
+	void SetData(long long x) {
+		if (sign) {
+			(*getSInt()) = x;
+		}
+		else {
+			(*getUInt()) = x;
+		}
+	}
 	
-	virtual void Update() = 0;
-	virtual void SetData(void * Data) {
-		if (this->Data)
-			free(this->Data);
-		this->Data = Data;
+	UInt* getUInt() {
+		return (UInt *)Data;
 	}
-	virtual UINT_64 getUIntData() { return 0; }
-	virtual SINT_64 getSIntData() { return 0; }
-	// virtual void* Create() = 0;
-	//void setData(UINT_64 b);
-	void* getData() {
-		return Data;
+	SInt* getSInt() {
+		return (SInt *)Data;
 	}
-	virtual ~Node() {}
+
+	~Node() {
+		if (!Data) {
+			free(Data);
+		}
+	}
 };

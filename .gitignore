@@ -2,6 +2,7 @@
 /Release/
 /x64/
 /Parser/
+/googletest/
 *.o
 *.obj
 *.vcd

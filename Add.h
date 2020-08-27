@@ -1,5 +1,6 @@
 #pragma once
 #include"Comb.h"
+#include"function.h"
 
 //class Add :public Comb {
 //public:
@@ -21,7 +22,7 @@
 //	}
 //};
 
-# if 0
+# if 1
 class Mul :protected Comb {
 public:
 	Mul(int id, int dtype, int nxtNum, int pre_num)
@@ -31,7 +32,7 @@ public:
 		if (status == Comb::setFlag)
 			return Data;
 		status += 1;
-		*(int*)Data = *(int*)((*Node::AllSet)[(*preTbl)[0]]->GetData()) + *(int*)((*Node::AllSet)[(*preTbl)[1]]->GetData());
+		*(UInt*)Data = Add(*(*Node::AllSet)[0]->getUInt() , *(*Node::AllSet)[1]->getUInt());
 		return Data;
 	}
 
