@@ -1,5 +1,6 @@
 #include"pch.h"
-#include"Number.h"
+#include"UInt.h"
+#include"SInt.h"
 namespace FuncType
 {
 	enum
@@ -71,9 +72,20 @@ template<typename T> inline T Memclk(T &a, T &b) {}
 template<typename T> inline T Memaddr(T &a, T &b) {}
 template<typename T> inline T Memmask(T &a, T &b) {}
 
-UInt AsUInt(SInt & b){
-	
+inline UInt AsUInt(SInt & b)
+{
+    if (b.sign) {
+        return *b.pnum;
+    }
+    else {
+        SInt a(b);
+        a.absTocom();
+        return *a.pnum;
+    }
 }
-SInt AsSInt(UInt & b){
-	
+
+inline SInt AsSInt(UInt & b) {
+    SInt ans(true, b.w, 0);
+    *ans.pnum = b;
+    return ans;
 }

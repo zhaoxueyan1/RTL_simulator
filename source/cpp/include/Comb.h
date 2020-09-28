@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Node.h"
-
+# if 0
 class Comb :public Node 
 {
 public:
@@ -12,6 +12,6 @@ public:
 	Comb(int id, int dtype, int pre_num, int nxtNum);
 
 };
-
+# endif
 
 

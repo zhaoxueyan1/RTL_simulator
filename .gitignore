@@ -3,6 +3,8 @@
 /x64/
 /Parser/
 /googletest/
+/cmake-build-debug
+/cmake-build-release-mingw-60
 *.o
 *.obj
 *.vcd

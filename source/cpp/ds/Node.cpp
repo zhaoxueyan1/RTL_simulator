@@ -1,4 +1,3 @@
-#pragma once
 #include"pch.h"
 #include"Node.h"
 
@@ -8,12 +7,12 @@ using namespace std;
 
 
 Node::Node(int id, bool sign, Func UpdateFunc)
-	:id(id), sign(sign),Updatefunc(UpdateFunc)
+        :id(id), sign(sign),Updatefunc(UpdateFunc)
 {
 }
 
 void Node::SetArg(bool sign, int preNum, int nxtNum) {
-	this->sign = sign;
+    this->sign = sign;
 
 }
 
